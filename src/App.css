@@ -1,0 +1,5 @@
+:root { --bg: #fff; --muted:#6b7280; }
+.app { max-width:420px; margin:18px auto; padding:12px; }
+.app-header { text-align:center; }
+.ring-wrap { display:flex; justify-content:center; margin:10px 0; }
+.app-main { padding:8px; }
