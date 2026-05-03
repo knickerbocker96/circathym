@@ -1,6 +1,4 @@
 {
-  "functions": {
-    "src/app/api/coach/route.ts": { "maxDuration": 15 },
-    "src/app/api/insight/route.ts": { "maxDuration": 15 }
-  }
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next"
 }

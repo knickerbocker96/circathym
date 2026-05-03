@@ -14,6 +14,7 @@ import {
 import { getClientKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
+export const maxDuration = 15;
 
 export async function POST(request: Request) {
   const startedAt = Date.now();
