@@ -5,9 +5,11 @@ import ClockDisplay from './components/ClockDisplay/ClockDisplay';
 import TimePicker from './components/TimePicker/TimePicker';
 import AlarmControls from './components/AlarmControls/AlarmControls';
 import Recommendations from './components/Recommendations/Recommendations';
+import WakeLogger from './components/WakeLogger/WakeLogger';
 import { recommendNearbyWakeTimes } from './logic/sleepCycle';
 import useAlarm from './hooks/useAlarm';
 import { formatHHMM, getNextTimeInTimeZone } from './utils/timeUtils';
+import { getSleepLog, logSleep } from './utils/sleepStorage';
 
 const SNOOZE_OPTIONS = [5, 10, 15, 20, 30];
 
@@ -28,6 +30,8 @@ export default function App() {
   const [snoozeEnabled, setSnoozeEnabled] = useState(false);
   const [isRinging, setIsRinging] = useState(false);
   const [scheduledAlarmDate, setScheduledAlarmDate] = useState(null);
+  const [showWakeLogger, setShowWakeLogger] = useState(false);
+  const [sleepLog, setSleepLog] = useState(() => getSleepLog());
   const [darkMode, setDarkMode] = useState(() => {
     try {
       const saved = localStorage.getItem('theme');
@@ -69,6 +73,7 @@ export default function App() {
     setIsRinging(true);
     setAlarmEnabled(false);
     setScheduledAlarmDate(null);
+    setShowWakeLogger(true);
   });
 
   function handleWakeTimeChange(nextWakeTime) {
@@ -108,6 +113,24 @@ export default function App() {
     setAlarmEnabled(false);
     setIsRinging(false);
     setScheduledAlarmDate(null);
+    setShowWakeLogger(false);
+  }
+
+  function handleLogSleep(entry) {
+    const waketime = getDateForTime(entry.waketime, currentTime);
+    let bedtime = getDateForTime(entry.bedtime, waketime);
+
+    if (bedtime >= waketime) {
+      bedtime = new Date(bedtime.getTime() - 24 * 60 * 60 * 1000);
+    }
+
+    const nextLog = logSleep({
+      bedtime,
+      waketime,
+      rating: entry.rating,
+    });
+
+    setSleepLog(nextLog);
   }
 
   function handleAlarmToggle() {
@@ -239,6 +262,20 @@ export default function App() {
 
         {hasUserSetWakeTime && <Recommendations times={rec} onSelect={handleRecommendationSelect} />}
 
+        {showWakeLogger ? (
+          <WakeLogger
+            defaultBedtime={formatHHMM(recommendationAnchor?.bedDate || new Date(Date.now() - 8 * 60 * 60 * 1000))}
+            defaultWaketime={formatHHMM(new Date())}
+            logCount={sleepLog.length}
+            onLog={handleLogSleep}
+            onDismiss={() => setShowWakeLogger(false)}
+          />
+        ) : (
+          <button type="button" className="wake-log-button" onClick={() => setShowWakeLogger(true)}>
+            Log Wake Quality
+          </button>
+        )}
+
         <AlarmControls
           alarmEnabled={alarmEnabled}
           snoozeEnabled={snoozeEnabled}
@@ -276,3 +313,10 @@ function roundToNearestFiveMinutes(date) {
   return rounded;
 }
 
+function getDateForTime(timeString, anchor) {
+  const [hour, minute] = timeString.split(':').map(Number);
+  const date = new Date(anchor);
+
+  date.setHours(hour, minute, 0, 0);
+  return date;
+}
