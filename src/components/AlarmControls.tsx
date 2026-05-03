@@ -32,6 +32,7 @@ export default function AlarmControls({
   }
 
   const sliderBg = `linear-gradient(to right, var(--apple-blue) 0%, var(--apple-blue) ${alarmSettings.volume * 100}%, var(--secondary) ${alarmSettings.volume * 100}%, var(--secondary) 100%)`;
+  const scheduledParts = scheduledLabel?.match(/^(.+)\s(AM|PM)$/);
 
   return (
     <div className="space-y-4">
@@ -40,9 +41,22 @@ export default function AlarmControls({
       </p>
 
       {scheduledLabel && (
-        <p className="text-center text-[13px] font-semibold" style={{ color: 'var(--apple-blue)' }}>
-          {scheduledLabel}
-        </p>
+        <div className="flex items-baseline justify-center gap-2" style={{ color: 'var(--apple-blue)' }}>
+          <span
+            className="text-[3.4rem] font-light leading-none"
+            style={{ fontFamily: 'var(--code-font)', fontVariantNumeric: 'tabular-nums' }}
+          >
+            {scheduledParts?.[1] ?? scheduledLabel}
+          </span>
+          {scheduledParts?.[2] && (
+            <span
+              className="text-[1.5rem] font-light leading-none"
+              style={{ fontFamily: 'var(--code-font)', fontVariantNumeric: 'tabular-nums' }}
+            >
+              {scheduledParts[2]}
+            </span>
+          )}
+        </div>
       )}
 
       {/* iOS toggle rows */}
@@ -55,7 +69,7 @@ export default function AlarmControls({
         />
         <div style={{ height: 1, background: 'var(--apple-separator)', marginLeft: 16 }} />
         <SwitchRow
-          label="Smart Snooze"
+          label="Snooze"
           active={snoozeEnabled}
           onChange={onSnoozeToggle}
           color="var(--apple-orange)"
@@ -105,7 +119,7 @@ export default function AlarmControls({
             step="0.05"
             value={alarmSettings.volume}
             onChange={e => update({ volume: Number(e.target.value) })}
-            className="w-full"
+            className="alarm-volume-slider w-full"
             style={{ background: sliderBg }}
           />
         </div>
@@ -121,7 +135,7 @@ export default function AlarmControls({
               color: alarmSettings.fadeIn ? '#FFFFFF' : 'var(--muted-foreground)',
             }}
           >
-            Fade In
+            Fade
           </button>
           <button
             type="button"

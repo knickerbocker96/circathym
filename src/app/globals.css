@@ -158,3 +158,31 @@ input[type="range"]::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
 }
+
+.alarm-volume-slider {
+  height: 6px;
+  border-radius: 999px;
+}
+.alarm-volume-slider::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--apple-blue);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  margin-top: -6px;
+}
+.alarm-volume-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+}
+.alarm-volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--apple-blue);
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+.alarm-volume-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+}

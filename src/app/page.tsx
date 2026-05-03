@@ -398,6 +398,87 @@ export default function Home() {
               )}
             </section>
 
+            <div className="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+              <section
+                className="overflow-hidden rounded-2xl bg-card card-shadow"
+                style={{ border: '1px solid var(--apple-separator)' }}
+              >
+                <button
+                  type="button"
+                  aria-expanded={showWakeLogger}
+                  onClick={() => setShowWakeLogger(v => !v)}
+                  className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
+                >
+                  <span aria-hidden="true" />
+                  <h2 className="text-[17px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
+                    Log
+                  </h2>
+                  <span
+                    className="justify-self-end text-[13px] font-semibold transition-transform duration-200"
+                    style={{
+                      color: 'var(--apple-blue)',
+                      transform: showWakeLogger ? 'rotate(180deg)' : 'rotate(0deg)',
+                      display: 'inline-block',
+                    }}
+                  >
+                    ▾
+                  </span>
+                </button>
+
+                {showWakeLogger && (
+                  <div className="p-4" style={{ borderTop: '1px solid var(--apple-separator)' }}>
+                    <WakeLogger
+                      defaultBedtime={defaultLogBedtime}
+                      defaultWaketime={defaultLogWaketime}
+                      onLog={handleLogSleep}
+                      onDismiss={() => setShowWakeLogger(false)}
+                    />
+                  </div>
+                )}
+              </section>
+
+              <section
+                className="overflow-hidden rounded-2xl bg-card card-shadow"
+                style={{ border: '1px solid var(--apple-separator)' }}
+              >
+                <button
+                  type="button"
+                  aria-expanded={showSuggestions}
+                  onClick={() => setShowSuggestions(v => !v)}
+                  className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
+                >
+                  <span aria-hidden="true" />
+                  <h2 className="text-[17px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
+                    Suggestions
+                  </h2>
+                  <span
+                    className="justify-self-end text-[13px] font-semibold transition-transform duration-200"
+                    style={{
+                      color: 'var(--apple-blue)',
+                      transform: showSuggestions ? 'rotate(180deg)' : 'rotate(0deg)',
+                      display: 'inline-block',
+                    }}
+                  >
+                    ▾
+                  </span>
+                </button>
+
+                {showSuggestions && (
+                  <div className="space-y-4 p-4" style={{ borderTop: '1px solid var(--apple-separator)' }}>
+                    <CycleComparisonCard
+                      personalCycleLength={personalCycleLength}
+                      sleepLog={sleepLog}
+                      bedDate={recommendationAnchor?.bedDate ?? null}
+                      wakeDate={wakeDate}
+                    />
+
+                    <BedtimeCalculator personalCycleLength={personalCycleLength} onUsePlan={handleUseBedtimePlan} />
+                    <SleepCoach personalCycleLength={personalCycleLength} sleepLog={sleepLog} />
+                  </div>
+                )}
+              </section>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
               {/* ══ Left column ══ */}
@@ -449,19 +530,9 @@ export default function Home() {
                   <p className="mt-3 text-center text-[11px] font-medium" style={{ color: 'var(--muted-foreground)' }}>
                     {personalCycleLength
                       ? `${personalCycleLength}m cycle learned from your wake quality`
-                      : 'Default 90m cycle — log 3 wakes to personalize'}
+                      : ''}
                   </p>
                 </div>
-
-                {/* Moved Recommendations here for better visibility */}
-                {hasUserSetWakeTime && rec.length > 0 && (
-                  <Recommendations
-                    times={rec}
-                    onSelect={handleRecommendationSelect}
-                    cycleLength={activeCycleLength}
-                    bedDate={recommendationAnchor?.bedDate ?? null}
-                  />
-                )}
 
                 {/* Wake time picker */}
                 <div
@@ -475,85 +546,6 @@ export default function Home() {
 
               {/* ══ Right column ══ */}
               <div className="space-y-4">
-
-                <section
-                  className="overflow-hidden rounded-2xl bg-card card-shadow"
-                  style={{ border: '1px solid var(--apple-separator)' }}
-                >
-                  <button
-                    type="button"
-                    aria-expanded={showWakeLogger}
-                    onClick={() => setShowWakeLogger(v => !v)}
-                    className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
-                  >
-                    <span aria-hidden="true" />
-                    <h2 className="text-[17px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
-                      Log
-                    </h2>
-                    <span
-                      className="justify-self-end text-[13px] font-semibold transition-transform duration-200"
-                      style={{
-                        color: 'var(--apple-blue)',
-                        transform: showWakeLogger ? 'rotate(180deg)' : 'rotate(0deg)',
-                        display: 'inline-block',
-                      }}
-                    >
-                      ▾
-                    </span>
-                  </button>
-
-                  {showWakeLogger && (
-                    <div className="p-4" style={{ borderTop: '1px solid var(--apple-separator)' }}>
-                      <WakeLogger
-                        defaultBedtime={defaultLogBedtime}
-                        defaultWaketime={defaultLogWaketime}
-                        onLog={handleLogSleep}
-                        onDismiss={() => setShowWakeLogger(false)}
-                      />
-                    </div>
-                  )}
-                </section>
-
-                <section
-                  className="overflow-hidden rounded-2xl bg-card card-shadow"
-                  style={{ border: '1px solid var(--apple-separator)' }}
-                >
-                  <button
-                    type="button"
-                    aria-expanded={showSuggestions}
-                    onClick={() => setShowSuggestions(v => !v)}
-                    className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
-                  >
-                    <span aria-hidden="true" />
-                    <h2 className="text-[17px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
-                      Suggestions
-                    </h2>
-                    <span
-                      className="justify-self-end text-[13px] font-semibold transition-transform duration-200"
-                      style={{
-                        color: 'var(--apple-blue)',
-                        transform: showSuggestions ? 'rotate(180deg)' : 'rotate(0deg)',
-                        display: 'inline-block',
-                      }}
-                    >
-                      ▾
-                    </span>
-                  </button>
-
-                  {showSuggestions && (
-                    <div className="space-y-4 p-4" style={{ borderTop: '1px solid var(--apple-separator)' }}>
-                      <CycleComparisonCard
-                        personalCycleLength={personalCycleLength}
-                        sleepLog={sleepLog}
-                        bedDate={recommendationAnchor?.bedDate ?? null}
-                        wakeDate={wakeDate}
-                      />
-
-                      <BedtimeCalculator personalCycleLength={personalCycleLength} onUsePlan={handleUseBedtimePlan} />
-                      <SleepCoach personalCycleLength={personalCycleLength} sleepLog={sleepLog} />
-                    </div>
-                  )}
-                </section>
 
                 <div
                   className="rounded-2xl bg-card card-shadow p-5"
@@ -575,6 +567,15 @@ export default function Home() {
                     onTestAlarm={handleTestAlarm}
                   />
                 </div>
+
+                {hasUserSetWakeTime && rec.length > 0 && (
+                  <Recommendations
+                    times={rec}
+                    onSelect={handleRecommendationSelect}
+                    cycleLength={activeCycleLength}
+                    bedDate={recommendationAnchor?.bedDate ?? null}
+                  />
+                )}
 
                 {sleepLog.length >= 5 && (
                   <InsightCard personalCycleLength={personalCycleLength} sleepLog={sleepLog} />
@@ -705,7 +706,7 @@ function WakeScore({
         {formatTime12(wakeDate)} · {classification.label}
       </p>
       <p className="text-[11px] font-medium mt-0.5" style={{ color: c.text, opacity: 0.75 }}>
-        {distance}m from your {cycleLength}m cycle boundary
+        {distance}min from your {cycleLength}min Cycle Boundary
       </p>
     </div>
   );
