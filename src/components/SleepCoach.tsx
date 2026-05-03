@@ -35,8 +35,8 @@ export default function SleepCoach({ personalCycleLength, sleepLog }: Props) {
         onClick={() => setOpen(v => !v)}
         className="w-full flex items-center justify-between px-5 py-4 transition-colors duration-150"
       >
-        <span className="text-[15px] font-semibold" style={{ color: 'var(--foreground)' }}>
-          AI Sleep Coach
+        <span className="text-[15px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
+          Sleep Coach
         </span>
         <span
           className="text-[11px] font-medium transition-transform duration-200"

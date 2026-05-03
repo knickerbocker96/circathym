@@ -46,7 +46,7 @@ export default function CycleComparisonCard({ personalCycleLength, sleepLog, bed
       >
         <div className="flex items-center gap-2 mb-4">
           <span className="text-[15px]">✦</span>
-          <p className="text-[15px] font-semibold" style={{ color: 'var(--foreground)' }}>
+          <p className="text-[15px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
             Rhythm Comparison
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function CycleComparisonCard({ personalCycleLength, sleepLog, bed
       <div className="px-5 pt-5 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-[15px]">✦</span>
-          <p className="text-[15px] font-semibold" style={{ color: 'var(--foreground)' }}>
+          <p className="text-[15px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
             Rhythm Comparison
           </p>
         </div>

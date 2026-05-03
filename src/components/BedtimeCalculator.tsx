@@ -32,7 +32,7 @@ export default function BedtimeCalculator({ personalCycleLength, onUsePlan }: Pr
         onClick={() => setOpen(v => !v)}
         className="w-full flex items-center justify-between px-5 py-4 transition-colors duration-150"
       >
-        <span className="text-[15px] font-semibold" style={{ color: 'var(--foreground)' }}>
+        <span className="text-[15px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
           Bedtime Calculator
         </span>
         <span

@@ -73,6 +73,7 @@ export default function Home() {
   });
   const [darkMode, setDarkMode] = useState(getInitialDarkMode);
   const [showUserAnalytics, setShowUserAnalytics] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [mounted, setMounted] = useState(false);
 
@@ -349,17 +350,18 @@ export default function Home() {
                 className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
               >
                 <span aria-hidden="true" />
-                <h2 className="text-[17px] font-bold tracking-normal" style={{ color: 'var(--foreground)' }}>
+                <h2 className="text-[17px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
                   Analytics
                 </h2>
                 <span
-                  className="justify-self-end rounded-full px-3 py-1 text-[12px] font-semibold"
+                  className="justify-self-end text-[13px] font-semibold transition-transform duration-200"
                   style={{
-                    background: 'var(--apple-fill)',
-                    color: 'var(--muted-foreground)',
+                    color: 'var(--apple-blue)',
+                    transform: showUserAnalytics ? 'rotate(180deg)' : 'rotate(0deg)',
+                    display: 'inline-block',
                   }}
                 >
-                  {showUserAnalytics ? 'Hide' : 'View'}
+                  ▾
                 </span>
               </button>
 
@@ -495,12 +497,46 @@ export default function Home() {
               {/* ══ Right column ══ */}
               <div className="space-y-4">
 
-                <CycleComparisonCard
-                  personalCycleLength={personalCycleLength}
-                  sleepLog={sleepLog}
-                  bedDate={recommendationAnchor?.bedDate ?? null}
-                  wakeDate={wakeDate}
-                />
+                <section
+                  className="overflow-hidden rounded-2xl bg-card card-shadow"
+                  style={{ border: '1px solid var(--apple-separator)' }}
+                >
+                  <button
+                    type="button"
+                    aria-expanded={showSuggestions}
+                    onClick={() => setShowSuggestions(v => !v)}
+                    className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
+                  >
+                    <span aria-hidden="true" />
+                    <h2 className="text-[17px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
+                      Suggestions
+                    </h2>
+                    <span
+                      className="justify-self-end text-[13px] font-semibold transition-transform duration-200"
+                      style={{
+                        color: 'var(--apple-blue)',
+                        transform: showSuggestions ? 'rotate(180deg)' : 'rotate(0deg)',
+                        display: 'inline-block',
+                      }}
+                    >
+                      ▾
+                    </span>
+                  </button>
+
+                  {showSuggestions && (
+                    <div className="space-y-4 p-4" style={{ borderTop: '1px solid var(--apple-separator)' }}>
+                      <CycleComparisonCard
+                        personalCycleLength={personalCycleLength}
+                        sleepLog={sleepLog}
+                        bedDate={recommendationAnchor?.bedDate ?? null}
+                        wakeDate={wakeDate}
+                      />
+
+                      <BedtimeCalculator personalCycleLength={personalCycleLength} onUsePlan={handleUseBedtimePlan} />
+                      <SleepCoach personalCycleLength={personalCycleLength} sleepLog={sleepLog} />
+                    </div>
+                  )}
+                </section>
 
                 {sleepLog.length >= 5 && (
                   <InsightCard personalCycleLength={personalCycleLength} sleepLog={sleepLog} />
@@ -525,8 +561,6 @@ export default function Home() {
                   </div>
                 )}
 
-                <BedtimeCalculator personalCycleLength={personalCycleLength} onUsePlan={handleUseBedtimePlan} />
-                <SleepCoach personalCycleLength={personalCycleLength} sleepLog={sleepLog} />
               </div>
             </div>
           </>
