@@ -471,27 +471,6 @@ export default function Home() {
                   <TimePicker value={wakeTimeStr} onChange={handleWakeTimeChange} />
                 </div>
 
-                {/* Alarm controls */}
-                <div
-                  className="rounded-2xl bg-card card-shadow p-5"
-                  style={{ border: '1px solid var(--apple-separator)' }}
-                >
-                  <AlarmControls
-                    alarmEnabled={alarmEnabled}
-                    snoozeEnabled={snoozeEnabled}
-                    isRinging={isRinging}
-                    scheduledLabel={scheduledAlarmDate ? formatTime12(scheduledAlarmDate) : null}
-                    alarmSettings={alarmSettings}
-                    snoozeOptions={smartSnoozeOptions}
-                    onAlarmToggle={handleAlarmToggle}
-                    onSnoozeToggle={() => setSnoozeEnabled(v => !v)}
-                    onAlarmSettingsChange={setAlarmSettings}
-                    onSnooze={handleSnooze}
-                    onClear={handleClear}
-                    onStop={handleStopRinging}
-                    onTestAlarm={handleTestAlarm}
-                  />
-                </div>
               </div>
 
               {/* ══ Right column ══ */}
@@ -575,6 +554,27 @@ export default function Home() {
                     </div>
                   )}
                 </section>
+
+                <div
+                  className="rounded-2xl bg-card card-shadow p-5"
+                  style={{ border: '1px solid var(--apple-separator)' }}
+                >
+                  <AlarmControls
+                    alarmEnabled={alarmEnabled}
+                    snoozeEnabled={snoozeEnabled}
+                    isRinging={isRinging}
+                    scheduledLabel={scheduledAlarmDate ? formatTime12(scheduledAlarmDate) : null}
+                    alarmSettings={alarmSettings}
+                    snoozeOptions={smartSnoozeOptions}
+                    onAlarmToggle={handleAlarmToggle}
+                    onSnoozeToggle={() => setSnoozeEnabled(v => !v)}
+                    onAlarmSettingsChange={setAlarmSettings}
+                    onSnooze={handleSnooze}
+                    onClear={handleClear}
+                    onStop={handleStopRinging}
+                    onTestAlarm={handleTestAlarm}
+                  />
+                </div>
 
                 {sleepLog.length >= 5 && (
                   <InsightCard personalCycleLength={personalCycleLength} sleepLog={sleepLog} />

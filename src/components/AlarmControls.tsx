@@ -35,7 +35,7 @@ export default function AlarmControls({
 
   return (
     <div className="space-y-4">
-      <p className="text-[11px] font-semibold tracking-[0.08em] uppercase text-center" style={{ color: 'var(--muted-foreground)' }}>
+      <p className="text-[17px] font-bold uppercase tracking-[0.08em] text-center" style={{ color: 'var(--foreground)' }}>
         Alarm
       </p>
 
