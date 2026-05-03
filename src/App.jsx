@@ -108,10 +108,6 @@ export default function App() {
     setAlarmEnabled(false);
     setIsRinging(false);
     setScheduledAlarmDate(null);
-    setHasUserSetWakeTime(false);
-    setRecommendationAnchor(null);
-    setSelectedRecommendationKey(null);
-    alert('Cleared');
   }
 
   function handleAlarmToggle() {
