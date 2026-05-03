@@ -1,4 +1,4 @@
-export const APP_TIME_ZONE = 'America/Los_Angeles';
+export const APP_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function formatHHMM(date, timeZone = APP_TIME_ZONE) {
   const parts = getTimeZoneParts(date, timeZone);

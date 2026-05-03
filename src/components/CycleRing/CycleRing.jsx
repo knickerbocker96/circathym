@@ -2,8 +2,6 @@ import React from 'react';
 import './CycleRing.css';
 import { formatTime12, getTimeZoneParts } from '../../utils/timeUtils';
 
-const CYCLE_MINUTES = 90;
-const DISRUPTIVE_MARK_MINUTES = 45;
 const REM_BY_CYCLE_MINUTES = [10, 15, 20, 25, 30];
 
 export default function CycleRing({
@@ -14,14 +12,17 @@ export default function CycleRing({
   showRedStages = true,
   showAmberStages = true,
   showGreenStages = true,
+  cycleMinutes = 90,
+  wakeClassification = null,
   size = 410,
 }) {
+  const cycle = cycleMinutes || 90;
   const parts = getTimeZoneParts(currentTime);
   const digitalTime = formatTime12(currentTime);
   const cx = size / 2;
   const cy = size / 2;
   const radius = size * 0.44;
-  const digitalWidth = digitalTime.length * 9 + 18;
+  const digitalWidth = digitalTime.length * 8.5 + 20;
   const hourAngle = ((parts.hour % 12) + parts.minute / 60) * 30;
   const minuteAngle = (parts.minute + parts.second / 60) * 6;
   const secondAngle = parts.second * 6;
@@ -30,15 +31,20 @@ export default function CycleRing({
   const sleepAngle = Math.min(durationMinutes * 0.5, 359.9);
   const sleepStartAngle = currentClockAngle;
   const sleepEndAngle = sleepStartAngle + sleepAngle;
-  const dividerCount = Math.floor(durationMinutes / CYCLE_MINUTES);
-  const remDividerCount = Math.ceil(durationMinutes / CYCLE_MINUTES);
-  const disruptiveDividerCount = Math.ceil(durationMinutes / CYCLE_MINUTES);
+  const wakeMarkerAngle = sleepEndAngle;
+  const wakeMarkerOuter = polarToCartesian(cx, cy, radius + 7, wakeMarkerAngle);
+  const wakeMarkerInner = polarToCartesian(cx, cy, radius - 50, wakeMarkerAngle);
+  const wakeMarkerDot = polarToCartesian(cx, cy, radius - 18, wakeMarkerAngle);
+  const wakeColor = getWakeColor(wakeClassification?.color);
+  const dividerCount = Math.floor(durationMinutes / cycle);
+  const remDividerCount = Math.ceil(durationMinutes / cycle);
+  const disruptiveDividerCount = Math.ceil(durationMinutes / cycle);
 
   const ticks = Array.from({ length: 60 }, (_, index) => {
     const isHourTick = index % 5 === 0;
     const angle = index * 6;
     const outer = polarToCartesian(cx, cy, radius, angle);
-    const inner = polarToCartesian(cx, cy, radius - (isHourTick ? 14 : 7), angle);
+    const inner = polarToCartesian(cx, cy, radius - (isHourTick ? 12 : 6), angle);
 
     return (
       <line
@@ -51,9 +57,10 @@ export default function CycleRing({
       />
     );
   });
+
   const numbers = Array.from({ length: 12 }, (_, index) => {
     const number = index + 1;
-    const position = polarToCartesian(cx, cy, radius - 30, number * 30);
+    const position = polarToCartesian(cx, cy, radius - 28, number * 30);
 
     return (
       <text key={number} className="clock-number" x={position.x} y={position.y}>
@@ -61,10 +68,11 @@ export default function CycleRing({
       </text>
     );
   });
+
   const cycleDividers = Array.from({ length: dividerCount }, (_, index) => {
-    const angle = sleepStartAngle + (index + 1) * CYCLE_MINUTES * 0.5;
+    const angle = sleepStartAngle + (index + 1) * cycle * 0.5;
     const inner = polarToCartesian(cx, cy, 20, angle);
-    const outer = polarToCartesian(cx, cy, radius - 22, angle);
+    const outer = polarToCartesian(cx, cy, radius - 20, angle);
 
     return (
       <line
@@ -77,23 +85,20 @@ export default function CycleRing({
       />
     );
   });
-  const remDividers = Array.from({ length: remDividerCount }, (_, index) => {
-    const cycleStartMinute = index * CYCLE_MINUTES;
-    const remDuration = REM_BY_CYCLE_MINUTES[Math.min(index, REM_BY_CYCLE_MINUTES.length - 1)];
-    const remStartMinute = cycleStartMinute + CYCLE_MINUTES - remDuration;
 
-    if (remStartMinute <= 0 || remStartMinute >= durationMinutes) {
-      return null;
-    }
+  const remDividers = Array.from({ length: remDividerCount }, (_, index) => {
+    const cycleStartMinute = index * cycle;
+    const remDuration = REM_BY_CYCLE_MINUTES[Math.min(index, REM_BY_CYCLE_MINUTES.length - 1)];
+    const remStartMinute = cycleStartMinute + cycle - remDuration;
+
+    if (remStartMinute <= 0 || remStartMinute >= durationMinutes) return null;
 
     const angle = sleepStartAngle + remStartMinute * 0.5;
     const inner = polarToCartesian(cx, cy, 24, angle);
-    const outer = polarToCartesian(cx, cy, radius - 24, angle);
+    const outer = polarToCartesian(cx, cy, radius - 22, angle);
     const rag = getRagColor(remDuration);
 
-    if (!shouldShowRagStage(rag.name, { showRedStages, showAmberStages, showGreenStages })) {
-      return null;
-    }
+    if (!shouldShowRagStage(rag.name, { showRedStages, showAmberStages, showGreenStages })) return null;
 
     return (
       <line
@@ -107,20 +112,16 @@ export default function CycleRing({
       />
     );
   });
+
   const disruptiveDividers = Array.from({ length: disruptiveDividerCount }, (_, index) => {
-    const disruptiveMinute = index * CYCLE_MINUTES + DISRUPTIVE_MARK_MINUTES;
+    const disruptiveMinute = index * cycle + Math.round(cycle / 2);
 
-    if (disruptiveMinute >= durationMinutes) {
-      return null;
-    }
-
-    if (!showRedStages) {
-      return null;
-    }
+    if (disruptiveMinute >= durationMinutes) return null;
+    if (!showRedStages) return null;
 
     const angle = sleepStartAngle + disruptiveMinute * 0.5;
     const inner = polarToCartesian(cx, cy, 28, angle);
-    const outer = polarToCartesian(cx, cy, radius - 26, angle);
+    const outer = polarToCartesian(cx, cy, radius - 24, angle);
 
     return (
       <line
@@ -147,20 +148,46 @@ export default function CycleRing({
       {sleepAngle > 0 && (
         <path
           className="sleep-window sleep-window--duration"
-          d={describePieSlice(cx, cy, radius - 22, sleepStartAngle, sleepEndAngle)}
+          d={describePieSlice(cx, cy, radius - 20, sleepStartAngle, sleepEndAngle)}
         />
       )}
       {showStageMarkers && disruptiveDividers}
       {showStageMarkers && remDividers}
       {showCycleBoundaries && cycleDividers}
+      {wakeDate && sleepAngle > 0 && (
+        <g className={`wake-marker wake-marker--${wakeClassification?.color || 'green'}`}>
+          <line
+            className="wake-marker__needle"
+            stroke={wakeColor}
+            x1={wakeMarkerInner.x}
+            y1={wakeMarkerInner.y}
+            x2={wakeMarkerOuter.x}
+            y2={wakeMarkerOuter.y}
+          />
+          <circle
+            className="wake-marker__dot"
+            fill={wakeColor}
+            cx={wakeMarkerDot.x}
+            cy={wakeMarkerDot.y}
+            r="7"
+          />
+          <circle
+            className="wake-marker__halo"
+            stroke={wakeColor}
+            cx={wakeMarkerDot.x}
+            cy={wakeMarkerDot.y}
+            r="12"
+          />
+        </g>
+      )}
       {ticks}
       {numbers}
       <ClockHand cx={cx} cy={cy} angle={hourAngle} length={radius * 0.5} className="clock-hand clock-hand--hour" />
       <ClockHand cx={cx} cy={cy} angle={minuteAngle} length={radius * 0.72} className="clock-hand clock-hand--minute" />
-      <ClockHand cx={cx} cy={cy} angle={secondAngle} length={radius * 0.78} className="clock-hand clock-hand--second" />
-      <circle className="clock-pin" cx={cx} cy={cy} r="5" />
-      <rect className="clock-digital-bg" x={cx - digitalWidth / 2} y={cy + 22} width={digitalWidth} height="24" rx="6" />
-      <text className="clock-digital-time" x={cx} y={cy + 38}>
+      <ClockHand cx={cx} cy={cy} angle={secondAngle} length={radius * 0.8} className="clock-hand clock-hand--second" />
+      <circle className="clock-pin" cx={cx} cy={cy} r="4.5" />
+      <rect className="clock-digital-bg" x={cx - digitalWidth / 2} y={cy + 20} width={digitalWidth} height={22} rx="6" />
+      <text className="clock-digital-time" x={cx} y={cy + 34}>
         {digitalTime}
       </text>
     </svg>
@@ -182,14 +209,13 @@ function describePieSlice(cx, cy, radius, startAngle, endAngle) {
 
 function ClockHand({ cx, cy, angle, length, className }) {
   const end = polarToCartesian(cx, cy, length, angle);
-
   return <line className={className} x1={cx} y1={cy} x2={end.x} y2={end.y} />;
 }
 
 function getRagColor(minutesFromCycleBoundary) {
-  if (minutesFromCycleBoundary <= 15) return { name: 'green', color: '#22c55e' };
-  if (minutesFromCycleBoundary <= 60) return { name: 'amber', color: '#f59e0b' };
-  return { name: 'red', color: '#ef4444' };
+  if (minutesFromCycleBoundary <= 15) return { name: 'green', color: '#34C759' };
+  if (minutesFromCycleBoundary <= 60) return { name: 'amber', color: '#FF9500' };
+  return { name: 'red', color: '#FF3B30' };
 }
 
 function shouldShowRagStage(name, filters) {
@@ -199,9 +225,14 @@ function shouldShowRagStage(name, filters) {
   return false;
 }
 
+function getWakeColor(color) {
+  if (color === 'red') return '#FF3B30';
+  if (color === 'amber') return '#FF9500';
+  return '#34C759';
+}
+
 function polarToCartesian(cx, cy, radius, angleDeg) {
   const angleRad = ((angleDeg - 90) * Math.PI) / 180;
-
   return {
     x: cx + radius * Math.cos(angleRad),
     y: cy + radius * Math.sin(angleRad),

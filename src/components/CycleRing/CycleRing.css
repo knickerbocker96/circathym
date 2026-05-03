@@ -10,8 +10,8 @@
 
 .clock-face {
   fill: var(--card-bg);
-  stroke: var(--text);
-  stroke-width: 6;
+  stroke: var(--border);
+  stroke-width: 1.5;
 }
 
 .sleep-window {
@@ -19,46 +19,64 @@
 }
 
 .sleep-window--duration {
-  fill: var(--accent);
-  opacity: 0.22;
+  fill: var(--sleep-blue);
+  opacity: 0.16;
 }
 
 .sleep-cycle-divider {
-  stroke: var(--accent);
-  stroke-width: 3.5;
+  stroke: var(--sleep-blue);
+  stroke-width: 3;
   stroke-linecap: round;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
 .sleep-rem-divider {
   stroke-width: 1.5;
   stroke-linecap: round;
   stroke-dasharray: 4 4;
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
 .sleep-disruptive-divider {
-  stroke: #ef4444;
+  stroke: #FF3B30;
   stroke-width: 2;
   stroke-linecap: round;
-  opacity: 0.85;
+  opacity: 0.8;
+}
+
+.wake-marker__needle {
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.18));
+}
+
+.wake-marker__dot {
+  stroke: var(--card-bg);
+  stroke-width: 2.5;
+}
+
+.wake-marker__halo {
+  fill: none;
+  stroke-width: 1.5;
+  opacity: 0.35;
 }
 
 .clock-tick {
-  stroke: var(--border);
+  stroke: var(--apple-separator, rgba(60, 60, 67, 0.3));
   stroke-width: 1.5;
   stroke-linecap: round;
 }
 
 .clock-tick--hour {
-  stroke: var(--text);
-  stroke-width: 3;
+  stroke: var(--dim);
+  stroke-width: 2.5;
 }
 
 .clock-number {
   fill: var(--text);
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   text-anchor: middle;
   dominant-baseline: middle;
 }
@@ -69,31 +87,40 @@
 }
 
 .clock-hand--hour {
-  stroke-width: 7;
+  stroke-width: 6;
 }
 
 .clock-hand--minute {
-  stroke-width: 5;
+  stroke-width: 4;
 }
 
 .clock-hand--second {
-  stroke: var(--text);
-  stroke-width: 2;
+  stroke: #FF3B30;
+  stroke-width: 1.5;
+}
+
+.dark .clock-hand--second {
+  stroke: #FF453A;
 }
 
 .clock-pin {
-  fill: var(--text);
+  fill: #FF3B30;
+}
+
+.dark .clock-pin {
+  fill: #FF453A;
 }
 
 .clock-digital-bg {
   fill: var(--card-bg);
-  opacity: 0.88;
+  opacity: 0.9;
 }
 
 .clock-digital-time {
   fill: var(--text);
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
   text-anchor: middle;
   dominant-baseline: middle;
 }

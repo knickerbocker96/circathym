@@ -1,56 +1,138 @@
-# Circathym — Minimalist Cycle-aware Alarm (MVP)
+# Circathym AI
 
-A small React + Vite prototype that visualizes 90-minute sleep cycles as a circular ring and rates a chosen wake time with a Red/Amber/Green system.
+**Adaptive sleep timing that learns your rhythm instead of assuming everyone runs on 90-minute cycles.**
 
-## Quick start (developer)
+Built for **BeaverHacks 2026**.
 
-Prereqs
-- Node (recommended 18+; for newest plugin features use Node 20+ or 22.12+)
-- npm (or pnpm/yarn)
+## The Problem
 
-Install
+Most consumer sleep-cycle apps give every user the same advice: wake up at a 90-minute boundary.
 
-1. clone repo
-   git clone <repo> circathym
-2. cd circathym
-3. install deps
-    npm install
-    - If you get peer dependency errors, try:
-      npm install --legacy-peer-deps
+That is simple, but it is not personal. Real sleep cycles vary, and a small difference per cycle can become a meaningful difference after a full night.
 
-Run dev server
+## The Solution
 
-  npm run dev
+Circathym AI learns a user's personal sleep rhythm from wake-quality feedback, then uses that learned rhythm to recommend better wake times, bedtime plans, alarm behavior, and coaching.
 
-Open in browser
+The core idea:
 
-  http://localhost:5173/
+> Turn subjective wake quality into adaptive sleep timing.
 
-Build for production
+Circathym is not medical sleep staging. It is a practical feedback engine for everyday sleep decisions.
 
-  npm run build
-  npm run preview
+## Why It Is Different
 
-## Files of interest
-- index.html — entry (root must contain <div id="root"></div>)
-- src/main.jsx — bootstraps React
-- src/App.jsx — app wiring & state
-- src/components/ — UI pieces (CycleRing, ClockDisplay, TimePicker, AlarmControls, Recommendations)
-- src/logic/sleepCycle.js — cycle calc & classifier
-- src/hooks/useAlarm.js — alarm scheduling + beep
+Circathym does not just say "AI sleep coach." The AI is the explanation layer. The core product is a rhythm engine:
 
-## How to use (UI)
-- Select a wake time via the time input.
-- The circular ring highlights the sleep-cycle segment for that wake time and shows Optimal/Acceptable/Disruptive.
-- Press "Set Alarm" to schedule a browser beep at the chosen time (page must be open).
+- Logs how refreshed the user felt after waking.
+- Learns a personal cycle length from high-quality wake entries.
+- Compares the learned rhythm against the generic 90-minute model.
+- Shows exactly why one wake time is better than another.
+- Uses the same calculation in the clock marker, proof card, recommendations, and AI coach.
 
-## Troubleshooting
-- Blank page: confirm index.html exists at project root and contains <div id="root"></div>.
-- 404 on `/`: ensure dev server is running and open http://localhost:5173/ (not /src/main.jsx).
-- Audio doesn't play: browser may block autoplay — interact with the page first.
+## Judge Demo
 
-## Notes
-- No backend. Uses local scheduling (setTimeout) and the WebAudio API for a beep.
-- SVG ring is in `CycleRing` (no external chart libs).
+Click **Judge Demo** in the header.
 
-License: MIT
+The demo seeds 8 realistic nights of wake-quality data and learns a **94-minute** rhythm.
+
+The proof moment:
+
+| Model | Wake Time | Result | Distance From Boundary |
+|---|---:|---|---:|
+| Generic app | 7:15 AM | Amber / Acceptable | 30 min |
+| Circathym | 7:15 AM | Green / Optimal | 10 min |
+
+Same wake time. Different model. Better decision.
+
+That comparison is calculated by the same classifier used by the clock's RAG wake marker.
+
+## Features
+
+- **Personal cycle learning:** derives a user's cycle length from high-quality wake logs.
+- **Rhythm proof card:** shows generic 90m vs learned rhythm side by side.
+- **RAG clock marker:** selected wake time is rendered as green, amber, or red on the clock.
+- **Wake recommendations:** suggests nearby times around learned cycle boundaries.
+- **Bedtime planner:** turns a required wake time into actionable bedtime options.
+- **AI sleep coach:** explains recommendations using recent logs and learned rhythm.
+- **Server-side OpenAI routes:** API key stays server-side through Next.js route handlers.
+- **Offline AI fallback:** demo still works when Wi-Fi or API access fails.
+- **Smart alarm:** ringtone choices, volume, fade-in, test alarm, and adaptive snooze.
+- **Local-first privacy:** sleep history stays in browser storage for the prototype.
+
+## 90-Second Pitch
+
+Most sleep apps assume everyone has 90-minute sleep cycles. But real cycles vary.
+
+Circathym learns from how you actually wake up. In the demo, eight wake-quality logs reveal a 94-minute rhythm. At 7:15 AM, the generic model is 30 minutes from a cycle boundary, while Circathym is only 10 minutes away. That changes the wake quality prediction from amber to green.
+
+The result is not just an alarm. It is an adaptive sleep-timing engine that turns feedback into better bedtime and wake decisions.
+
+## Tech Stack
+
+- Next.js 16 App Router
+- React 19
+- Tailwind CSS 4
+- shadcn-style UI primitives
+- OpenAI API via Next.js route handlers
+- Browser `localStorage` for prototype sleep history
+- WebAudio API for alarm tones
+
+## Architecture
+
+- `src/app/page.tsx` wires the main dashboard, judge demo, learned cycle state, alarm flow, and RAG wake score.
+- `src/logic/cyclePersonalization.js` learns cycle length, confidence, sleep debt, and wake windows.
+- `src/logic/sleepCycle.js` classifies wake times as green, amber, or red.
+- `src/components/CycleComparisonCard.tsx` proves the learned model against the generic 90-minute model.
+- `src/components/CycleRing/` renders the analog clock, sleep-cycle cuts, and RAG wake marker.
+- `src/app/api/coach/route.ts` and `src/app/api/insight/route.ts` keep OpenAI calls server-side.
+
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open:
+
+```txt
+http://localhost:3000
+```
+
+For live OpenAI responses:
+
+```bash
+cp .env.example .env.local
+# then add your key to .env.local
+```
+
+Without an API key, Circathym uses deterministic fallback coaching so the demo still works.
+
+## Build
+
+```bash
+npm run build
+```
+
+## AI Safety Audit
+
+```bash
+npm run audit:ai
+```
+
+The audit checks for server-only OpenAI usage, route rate limiting, request sanitization, provider timeouts, fallback behavior, medical-scope boundaries, and lightweight SRE logs.
+
+Current limiter strategy is in-memory per IP, which is enough for a hackathon demo. For a public production launch, replace it with Redis, Upstash, or Vercel KV so limits work consistently across serverless instances.
+
+## Safety Note
+
+Circathym is a wellness prototype, not medical advice. It does not diagnose sleep disorders or perform medical sleep staging. It uses self-reported wake quality to personalize lightweight sleep-timing recommendations.
+
+## What We Would Build Next
+
+- Calendar-aware bedtime planning.
+- Wearable import for passive sleep/wake validation.
+- Multi-week trend analysis.
+- Confidence intervals around learned cycle estimates.
+- Private account sync across devices.
