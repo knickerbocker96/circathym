@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import CycleRing from './components/CycleRing/CycleRing';
 import ClockDisplay from './components/ClockDisplay/ClockDisplay';
@@ -7,31 +7,44 @@ import AlarmControls from './components/AlarmControls/AlarmControls';
 import Recommendations from './components/Recommendations/Recommendations';
 import { recommendWakeTimes, classifyWakeTime } from './logic/sleepCycle';
 import useAlarm from './hooks/useAlarm';
+import { formatHHMM, getNextTimeInTimeZone } from './utils/timeUtils';
 
 export default function App() {
-  const now = new Date();
-  const [bedTime] = useState(now);
+  const [currentTime, setCurrentTime] = useState(() => new Date());
   const [wakeTimeStr, setWakeTimeStr] = useState(() => {
     const t = new Date(Date.now() + 1000 * 60 * 60 * 7);
-    return t.toTimeString().slice(0, 5);
+    return formatHHMM(t);
   });
 
+  useEffect(() => {
+    function tick() {
+      setCurrentTime(new Date());
+    }
+
+    tick();
+    const id = setInterval(tick, 1000);
+
+    return () => clearInterval(id);
+  }, []);
+
   const wakeDate = useMemo(() => {
-    const [hh, mm] = wakeTimeStr.split(':').map(Number);
-    const d = new Date();
-    d.setHours(hh, mm, 0, 0);
-    if (d < new Date()) d.setDate(d.getDate() + 1);
-    return d;
-  }, [wakeTimeStr]);
+    return getNextTimeInTimeZone(wakeTimeStr, currentTime);
+  }, [wakeTimeStr, currentTime]);
 
-  const classification = classifyWakeTime(bedTime, wakeDate);
-  const segments = 6;
-  const activeIndex = Math.max(0, classification.cycleIndex) % segments;
+  const classification = useMemo(() => {
+    return classifyWakeTime(currentTime, wakeDate);
+  }, [currentTime, wakeDate]);
   const colorMap = { green: '#22c55e', amber: '#f59e0b', red: '#ef4444' };
-  const ringColor = colorMap[classification.color] || '#ef4444';
+  const ragColor = colorMap[classification.color] || '#ef4444';
 
-  const rec = recommendWakeTimes(bedTime, 6);
+  const rec = useMemo(() => {
+    return recommendWakeTimes(currentTime, 6);
+  }, [currentTime]);
   const { setAlarmAt, clearAlarm } = useAlarm();
+
+  function handleRecommendationSelect(date) {
+    setWakeTimeStr(formatHHMM(date));
+  }
 
   return (
     <div className="app">
@@ -41,16 +54,16 @@ export default function App() {
 
       <main className="app-main">
         <div className="ring-wrap">
-          <CycleRing segments={segments} activeIndex={activeIndex} activeColor={ringColor} />
+          <CycleRing currentTime={currentTime} wakeDate={wakeDate} ragColor={ragColor} />
         </div>
 
-        <ClockDisplay wakeDate={wakeDate} label={classification.label} />
+        <ClockDisplay currentTime={currentTime} wakeDate={wakeDate} label={classification.label} />
 
         <TimePicker value={wakeTimeStr} onChange={setWakeTimeStr} />
 
         <AlarmControls onSet={() => { setAlarmAt(wakeDate); alert('Alarm set'); }} onClear={() => { clearAlarm(); alert('Cleared'); }} />
 
-        <Recommendations times={rec} />
+        <Recommendations times={rec} onSelect={handleRecommendationSelect} />
       </main>
     </div>
   );

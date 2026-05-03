@@ -1,2 +1,25 @@
-.recommendations { margin-top:12px; font-size:0.95rem; }
-.recommendations ul { margin:8px 0 0 16px; }
+.recommendations {
+  margin-top: 12px;
+  font-size: 0.95rem;
+}
+
+.recommendations-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.recommendation-button {
+  min-height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+  font-weight: 700;
+}
+
+.recommendation-button:active {
+  transform: translateY(1px);
+}

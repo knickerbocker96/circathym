@@ -1,15 +1,18 @@
 import React from 'react';
 import './Recommendations.css';
+import { formatTime12 } from '../../utils/timeUtils';
 
-export default function Recommendations({ times = [] }) {
+export default function Recommendations({ times = [], onSelect }) {
   return (
     <div className="recommendations">
       <strong>Recommended wake times</strong>
-      <ul>
+      <div className="recommendations-list">
         {times.map((t, i) => (
-          <li key={i}>{t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</li>
+          <button key={i} className="recommendation-button" type="button" onClick={() => onSelect?.(t)}>
+            {formatTime12(t)}
+          </button>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

@@ -1,1 +1,74 @@
-.cycle-ring { display:block; margin:0 auto; }
+.cycle-ring {
+  display: block;
+  margin: 0 auto;
+}
+
+.analog-clock {
+  max-width: min(78vw, 300px);
+  height: auto;
+}
+
+.clock-face {
+  fill: #ffffff;
+  stroke: #111827;
+  stroke-width: 6;
+}
+
+.sleep-window {
+  stroke: none;
+}
+
+.sleep-window--duration {
+  fill: #3b82f6;
+  opacity: 0.22;
+}
+
+.sleep-window--final {
+  opacity: 0.5;
+}
+
+.clock-tick {
+  stroke: #9ca3af;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.clock-tick--hour {
+  stroke: #111827;
+  stroke-width: 3;
+}
+
+.clock-hand {
+  stroke: #111827;
+  stroke-linecap: round;
+}
+
+.clock-hand--hour {
+  stroke-width: 7;
+}
+
+.clock-hand--minute {
+  stroke-width: 5;
+}
+
+.clock-hand--second {
+  stroke: #ef4444;
+  stroke-width: 2;
+}
+
+.clock-pin {
+  fill: #111827;
+}
+
+.clock-digital-bg {
+  fill: #ffffff;
+  opacity: 0.88;
+}
+
+.clock-digital-time {
+  fill: #111827;
+  font-size: 14px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
