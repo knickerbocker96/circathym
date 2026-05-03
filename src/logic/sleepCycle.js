@@ -14,14 +14,14 @@ export function recommendWakeTimes(bedDate, count = 6, latency = DEFAULT_LATENCY
 export function classifyWakeTime(bedDate, wakeDate, latency = DEFAULT_LATENCY_MIN, cycle = CYCLE_MIN) {
   const onset = addMinutes(bedDate, latency);
   const deltaMin = (wakeDate - onset) / MS_PER_MIN;
-  if (deltaMin < 0) return { color: 'red', label: 'Before sleep onset', deltaMin };
+  if (deltaMin < 0) return { color: 'green', label: 'Before sleep onset', deltaMin };
 
   const posInCycle = ((deltaMin % cycle) + cycle) % cycle;
   const distToNearestBoundary = Math.min(posInCycle, cycle - posInCycle);
 
   let color = 'red', label = 'Disruptive';
   if (distToNearestBoundary <= 15) { color = 'green'; label = 'Optimal'; }
-  else if (distToNearestBoundary <= 45) { color = 'amber'; label = 'Acceptable'; }
+  else if (distToNearestBoundary <= 60 ) { color = 'amber'; label = 'Acceptable'; }
 
   const cycleIndex = Math.floor(deltaMin / cycle);
   const minutesToNextBoundary = cycle - posInCycle;

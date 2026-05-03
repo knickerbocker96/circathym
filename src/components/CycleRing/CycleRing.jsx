@@ -2,9 +2,13 @@ import React from 'react';
 import './CycleRing.css';
 import { formatTime12, getTimeZoneParts } from '../../utils/timeUtils';
 
-export default function CycleRing({ currentTime, wakeDate, ragColor = '#22c55e', size = 260 }) {
+const CYCLE_MINUTES = 90;
+const DISRUPTIVE_MARK_MINUTES = 45;
+const REM_BY_CYCLE_MINUTES = [10, 15, 20, 25, 30];
+
+export default function CycleRing({ currentTime, wakeDate, size = 330 }) {
   const parts = getTimeZoneParts(currentTime);
-  const digitalTime = formatTime12(currentTime, undefined, true);
+  const digitalTime = formatTime12(currentTime);
   const cx = size / 2;
   const cy = size / 2;
   const radius = size * 0.44;
@@ -14,10 +18,11 @@ export default function CycleRing({ currentTime, wakeDate, ragColor = '#22c55e',
   const currentClockAngle = ((parts.hour % 12) * 60 + parts.minute + parts.second / 60) * 0.5;
   const durationMinutes = wakeDate ? Math.max(0, (wakeDate - currentTime) / 60000) : 0;
   const sleepAngle = Math.min(durationMinutes * 0.5, 359.9);
-  const finalSegmentAngle = Math.min(sleepAngle, 45);
   const sleepStartAngle = currentClockAngle;
   const sleepEndAngle = sleepStartAngle + sleepAngle;
-  const finalStartAngle = sleepEndAngle - finalSegmentAngle;
+  const dividerCount = Math.floor(durationMinutes / CYCLE_MINUTES);
+  const remDividerCount = Math.ceil(durationMinutes / CYCLE_MINUTES);
+  const disruptiveDividerCount = Math.ceil(durationMinutes / CYCLE_MINUTES);
 
   const ticks = Array.from({ length: 60 }, (_, index) => {
     const isHourTick = index % 5 === 0;
@@ -29,6 +34,80 @@ export default function CycleRing({ currentTime, wakeDate, ragColor = '#22c55e',
       <line
         key={index}
         className={isHourTick ? 'clock-tick clock-tick--hour' : 'clock-tick'}
+        x1={inner.x}
+        y1={inner.y}
+        x2={outer.x}
+        y2={outer.y}
+      />
+    );
+  });
+  const numbers = Array.from({ length: 12 }, (_, index) => {
+    const number = index + 1;
+    const position = polarToCartesian(cx, cy, radius - 30, number * 30);
+
+    return (
+      <text key={number} className="clock-number" x={position.x} y={position.y}>
+        {number}
+      </text>
+    );
+  });
+  const cycleDividers = Array.from({ length: dividerCount }, (_, index) => {
+    const angle = sleepStartAngle + (index + 1) * CYCLE_MINUTES * 0.5;
+    const inner = polarToCartesian(cx, cy, 20, angle);
+    const outer = polarToCartesian(cx, cy, radius - 22, angle);
+
+    return (
+      <line
+        key={index}
+        className="sleep-cycle-divider"
+        x1={inner.x}
+        y1={inner.y}
+        x2={outer.x}
+        y2={outer.y}
+      />
+    );
+  });
+  const remDividers = Array.from({ length: remDividerCount }, (_, index) => {
+    const cycleStartMinute = index * CYCLE_MINUTES;
+    const remDuration = REM_BY_CYCLE_MINUTES[Math.min(index, REM_BY_CYCLE_MINUTES.length - 1)];
+    const remStartMinute = cycleStartMinute + CYCLE_MINUTES - remDuration;
+
+    if (remStartMinute <= 0 || remStartMinute >= durationMinutes) {
+      return null;
+    }
+
+    const angle = sleepStartAngle + remStartMinute * 0.5;
+    const inner = polarToCartesian(cx, cy, 24, angle);
+    const outer = polarToCartesian(cx, cy, radius - 24, angle);
+    const color = getRagColor(remDuration);
+
+    return (
+      <line
+        key={index}
+        className="sleep-rem-divider"
+        stroke={color}
+        x1={inner.x}
+        y1={inner.y}
+        x2={outer.x}
+        y2={outer.y}
+      />
+    );
+  });
+  const disruptiveDividers = Array.from({ length: disruptiveDividerCount }, (_, index) => {
+    const disruptiveMinute = index * CYCLE_MINUTES + DISRUPTIVE_MARK_MINUTES;
+
+    if (disruptiveMinute >= durationMinutes) {
+      return null;
+    }
+
+    const angle = sleepStartAngle + disruptiveMinute * 0.5;
+    const inner = polarToCartesian(cx, cy, 28, angle);
+    const outer = polarToCartesian(cx, cy, radius - 26, angle);
+
+    return (
+      <line
+        key={index}
+        className="sleep-disruptive-divider"
         x1={inner.x}
         y1={inner.y}
         x2={outer.x}
@@ -53,14 +132,11 @@ export default function CycleRing({ currentTime, wakeDate, ragColor = '#22c55e',
           d={describePieSlice(cx, cy, radius - 22, sleepStartAngle, sleepEndAngle)}
         />
       )}
-      {finalSegmentAngle > 0 && (
-        <path
-          className="sleep-window sleep-window--final"
-          d={describePieSlice(cx, cy, radius - 22, finalStartAngle, sleepEndAngle)}
-          fill={ragColor}
-        />
-      )}
+      {disruptiveDividers}
+      {remDividers}
+      {cycleDividers}
       {ticks}
+      {numbers}
       <ClockHand cx={cx} cy={cy} angle={hourAngle} length={radius * 0.5} className="clock-hand clock-hand--hour" />
       <ClockHand cx={cx} cy={cy} angle={minuteAngle} length={radius * 0.72} className="clock-hand clock-hand--minute" />
       <ClockHand cx={cx} cy={cy} angle={secondAngle} length={radius * 0.78} className="clock-hand clock-hand--second" />
@@ -90,6 +166,12 @@ function ClockHand({ cx, cy, angle, length, className }) {
   const end = polarToCartesian(cx, cy, length, angle);
 
   return <line className={className} x1={cx} y1={cy} x2={end.x} y2={end.y} />;
+}
+
+function getRagColor(minutesFromCycleBoundary) {
+  if (minutesFromCycleBoundary <= 15) return '#22c55e';
+  if (minutesFromCycleBoundary <= 60) return '#f59e0b';
+  return '#ef4444';
 }
 
 function polarToCartesian(cx, cy, radius, angleDeg) {
