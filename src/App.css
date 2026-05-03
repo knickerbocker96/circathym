@@ -28,3 +28,40 @@
   background: #111827;
   color: #ffffff;
 }
+
+.rag-toggles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: -4px auto 12px;
+  width: min(100%, 300px);
+}
+
+.rag-toggle {
+  min-height: 32px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #374151;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.rag-toggle--red.rag-toggle--active {
+  border-color: #ef4444;
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.rag-toggle--amber.rag-toggle--active {
+  border-color: #f59e0b;
+  background: #f59e0b;
+  color: #111827;
+}
+
+.rag-toggle--green.rag-toggle--active {
+  border-color: #22c55e;
+  background: #22c55e;
+  color: #ffffff;
+}

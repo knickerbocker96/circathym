@@ -18,8 +18,11 @@ export default function App() {
   const [hasUserSetWakeTime, setHasUserSetWakeTime] = useState(false);
   const [recommendationAnchor, setRecommendationAnchor] = useState(null);
   const [selectedRecommendationKey, setSelectedRecommendationKey] = useState(null);
-  const [showCycleBoundaries, setShowCycleBoundaries] = useState(true);
-  const [showStageMarkers, setShowStageMarkers] = useState(true);
+  const [showCycleBoundaries, setShowCycleBoundaries] = useState(false);
+  const [showStageMarkers, setShowStageMarkers] = useState(false);
+  const [showRedStages, setShowRedStages] = useState(false);
+  const [showAmberStages, setShowAmberStages] = useState(false);
+  const [showGreenStages, setShowGreenStages] = useState(false);
 
   useEffect(() => {
     function tick() {
@@ -72,6 +75,27 @@ export default function App() {
     alert('Cleared');
   }
 
+  function handleStageToggle() {
+    const nextValue = !showStageMarkers;
+
+    setShowStageMarkers(nextValue);
+    setShowRedStages(nextValue);
+    setShowAmberStages(nextValue);
+    setShowGreenStages(nextValue);
+  }
+
+  function handleRagToggle(color) {
+    setShowStageMarkers(true);
+
+    if (color === 'red') {
+      setShowRedStages((value) => !value);
+    } else if (color === 'amber') {
+      setShowAmberStages((value) => !value);
+    } else if (color === 'green') {
+      setShowGreenStages((value) => !value);
+    }
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -85,6 +109,9 @@ export default function App() {
             wakeDate={wakeDate}
             showCycleBoundaries={showCycleBoundaries}
             showStageMarkers={showStageMarkers}
+            showRedStages={showRedStages}
+            showAmberStages={showAmberStages}
+            showGreenStages={showGreenStages}
           />
         </div>
 
@@ -101,9 +128,33 @@ export default function App() {
           <button
             type="button"
             className={showStageMarkers ? 'display-toggle display-toggle--active' : 'display-toggle'}
-            onClick={() => setShowStageMarkers((value) => !value)}
+            onClick={handleStageToggle}
           >
-            Sleep Stages
+            Stages
+          </button>
+        </div>
+
+        <div className="rag-toggles" aria-label="Stage marker color options">
+          <button
+            type="button"
+            className={showRedStages ? 'rag-toggle rag-toggle--red rag-toggle--active' : 'rag-toggle rag-toggle--red'}
+            onClick={() => handleRagToggle('red')}
+          >
+            Red
+          </button>
+          <button
+            type="button"
+            className={showAmberStages ? 'rag-toggle rag-toggle--amber rag-toggle--active' : 'rag-toggle rag-toggle--amber'}
+            onClick={() => handleRagToggle('amber')}
+          >
+            Amber
+          </button>
+          <button
+            type="button"
+            className={showGreenStages ? 'rag-toggle rag-toggle--green rag-toggle--active' : 'rag-toggle rag-toggle--green'}
+            onClick={() => handleRagToggle('green')}
+          >
+            Green
           </button>
         </div>
 

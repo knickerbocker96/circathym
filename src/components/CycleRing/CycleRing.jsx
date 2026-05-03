@@ -11,6 +11,9 @@ export default function CycleRing({
   wakeDate,
   showCycleBoundaries = true,
   showStageMarkers = true,
+  showRedStages = true,
+  showAmberStages = true,
+  showGreenStages = true,
   size = 410,
 }) {
   const parts = getTimeZoneParts(currentTime);
@@ -86,13 +89,17 @@ export default function CycleRing({
     const angle = sleepStartAngle + remStartMinute * 0.5;
     const inner = polarToCartesian(cx, cy, 24, angle);
     const outer = polarToCartesian(cx, cy, radius - 24, angle);
-    const color = getRagColor(remDuration);
+    const rag = getRagColor(remDuration);
+
+    if (!shouldShowRagStage(rag.name, { showRedStages, showAmberStages, showGreenStages })) {
+      return null;
+    }
 
     return (
       <line
         key={index}
         className="sleep-rem-divider"
-        stroke={color}
+        stroke={rag.color}
         x1={inner.x}
         y1={inner.y}
         x2={outer.x}
@@ -104,6 +111,10 @@ export default function CycleRing({
     const disruptiveMinute = index * CYCLE_MINUTES + DISRUPTIVE_MARK_MINUTES;
 
     if (disruptiveMinute >= durationMinutes) {
+      return null;
+    }
+
+    if (!showRedStages) {
       return null;
     }
 
@@ -176,9 +187,16 @@ function ClockHand({ cx, cy, angle, length, className }) {
 }
 
 function getRagColor(minutesFromCycleBoundary) {
-  if (minutesFromCycleBoundary <= 15) return '#22c55e';
-  if (minutesFromCycleBoundary <= 60) return '#f59e0b';
-  return '#ef4444';
+  if (minutesFromCycleBoundary <= 15) return { name: 'green', color: '#22c55e' };
+  if (minutesFromCycleBoundary <= 60) return { name: 'amber', color: '#f59e0b' };
+  return { name: 'red', color: '#ef4444' };
+}
+
+function shouldShowRagStage(name, filters) {
+  if (name === 'red') return filters.showRedStages;
+  if (name === 'amber') return filters.showAmberStages;
+  if (name === 'green') return filters.showGreenStages;
+  return false;
 }
 
 function polarToCartesian(cx, cy, radius, angleDeg) {
