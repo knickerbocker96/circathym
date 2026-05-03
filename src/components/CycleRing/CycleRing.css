@@ -9,8 +9,8 @@
 }
 
 .clock-face {
-  fill: #ffffff;
-  stroke: #111827;
+  fill: var(--card-bg);
+  stroke: var(--text);
   stroke-width: 6;
 }
 
@@ -19,12 +19,12 @@
 }
 
 .sleep-window--duration {
-  fill: #3b82f6;
+  fill: var(--accent);
   opacity: 0.22;
 }
 
 .sleep-cycle-divider {
-  stroke: #1d4ed8;
+  stroke: var(--accent);
   stroke-width: 3.5;
   stroke-linecap: round;
   opacity: 0.9;
@@ -45,18 +45,18 @@
 }
 
 .clock-tick {
-  stroke: #9ca3af;
+  stroke: var(--border);
   stroke-width: 1.5;
   stroke-linecap: round;
 }
 
 .clock-tick--hour {
-  stroke: #111827;
+  stroke: var(--text);
   stroke-width: 3;
 }
 
 .clock-number {
-  fill: #111827;
+  fill: var(--text);
   font-size: 17px;
   font-weight: 800;
   text-anchor: middle;
@@ -64,7 +64,7 @@
 }
 
 .clock-hand {
-  stroke: #111827;
+  stroke: var(--text);
   stroke-linecap: round;
 }
 
@@ -77,21 +77,21 @@
 }
 
 .clock-hand--second {
-  stroke: #111827;
+  stroke: var(--text);
   stroke-width: 2;
 }
 
 .clock-pin {
-  fill: #111827;
+  fill: var(--text);
 }
 
 .clock-digital-bg {
-  fill: #ffffff;
+  fill: var(--card-bg);
   opacity: 0.88;
 }
 
 .clock-digital-time {
-  fill: #111827;
+  fill: var(--text);
   font-size: 15px;
   font-weight: 800;
   text-anchor: middle;

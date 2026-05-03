@@ -20,6 +20,19 @@ export default function App() {
   const [selectedRecommendationKey, setSelectedRecommendationKey] = useState(null);
   const [showCycleBoundaries, setShowCycleBoundaries] = useState(true);
   const [showStageMarkers, setShowStageMarkers] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('theme');
+      return saved ? saved === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    } catch (e) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    try { localStorage.setItem('theme', darkMode ? 'dark' : 'light'); } catch (e) {}
+  }, [darkMode]);
 
   useEffect(() => {
     function tick() {
@@ -76,6 +89,14 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1>Circathym</h1>
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={() => setDarkMode((v) => !v)}
+          aria-label="Toggle dark mode"
+        >
+          {darkMode ? '☀️' : '🌙'}
+        </button>
       </header>
 
       <main className="app-main">
