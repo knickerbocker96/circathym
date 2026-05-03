@@ -35,7 +35,7 @@ export default function AlarmControls({
   const scheduledParts = scheduledLabel?.match(/^(.+)\s(AM|PM)$/);
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-full flex-col justify-between gap-4">
       <p className="text-[17px] font-bold uppercase tracking-[0.08em] text-center" style={{ color: 'var(--foreground)' }}>
         Alarm
       </p>

@@ -486,7 +486,7 @@ export default function Home() {
 
                 {/* Clock card */}
                 <div
-                  className="rounded-2xl bg-card card-shadow p-6"
+                  className="rounded-2xl bg-card card-shadow p-6 lg:min-h-[520px]"
                   style={{ border: '1px solid var(--apple-separator)' }}
                 >
                   <div className="flex justify-center">
@@ -548,7 +548,7 @@ export default function Home() {
               <div className="space-y-4">
 
                 <div
-                  className="rounded-2xl bg-card card-shadow p-5"
+                  className="rounded-2xl bg-card card-shadow p-5 lg:min-h-[520px]"
                   style={{ border: '1px solid var(--apple-separator)' }}
                 >
                   <AlarmControls
