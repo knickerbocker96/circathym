@@ -6,12 +6,13 @@ const CYCLE_MINUTES = 90;
 const DISRUPTIVE_MARK_MINUTES = 45;
 const REM_BY_CYCLE_MINUTES = [10, 15, 20, 25, 30];
 
-export default function CycleRing({ currentTime, wakeDate, size = 330 }) {
+export default function CycleRing({ currentTime, wakeDate, size = 410 }) {
   const parts = getTimeZoneParts(currentTime);
   const digitalTime = formatTime12(currentTime);
   const cx = size / 2;
   const cy = size / 2;
   const radius = size * 0.44;
+  const digitalWidth = digitalTime.length * 9 + 18;
   const hourAngle = ((parts.hour % 12) + parts.minute / 60) * 30;
   const minuteAngle = (parts.minute + parts.second / 60) * 6;
   const secondAngle = parts.second * 6;
@@ -141,7 +142,7 @@ export default function CycleRing({ currentTime, wakeDate, size = 330 }) {
       <ClockHand cx={cx} cy={cy} angle={minuteAngle} length={radius * 0.72} className="clock-hand clock-hand--minute" />
       <ClockHand cx={cx} cy={cy} angle={secondAngle} length={radius * 0.78} className="clock-hand clock-hand--second" />
       <circle className="clock-pin" cx={cx} cy={cy} r="5" />
-      <rect className="clock-digital-bg" x={cx - 54} y={cy + 22} width="108" height="24" rx="6" />
+      <rect className="clock-digital-bg" x={cx - digitalWidth / 2} y={cy + 22} width={digitalWidth} height="24" rx="6" />
       <text className="clock-digital-time" x={cx} y={cy + 38}>
         {digitalTime}
       </text>

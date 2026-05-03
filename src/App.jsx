@@ -5,7 +5,7 @@ import ClockDisplay from './components/ClockDisplay/ClockDisplay';
 import TimePicker from './components/TimePicker/TimePicker';
 import AlarmControls from './components/AlarmControls/AlarmControls';
 import Recommendations from './components/Recommendations/Recommendations';
-import { recommendWakeTimes } from './logic/sleepCycle';
+import { recommendNearbyWakeTimes } from './logic/sleepCycle';
 import useAlarm from './hooks/useAlarm';
 import { formatHHMM, getNextTimeInTimeZone } from './utils/timeUtils';
 
@@ -13,8 +13,9 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [wakeTimeStr, setWakeTimeStr] = useState(() => {
     const t = new Date(Date.now() + 1000 * 60 * 60 * 7);
-    return formatHHMM(t);
+    return formatHHMM(roundToNextFiveMinutes(t));
   });
+  const [hasUserSetWakeTime, setHasUserSetWakeTime] = useState(false);
 
   useEffect(() => {
     function tick() {
@@ -32,12 +33,19 @@ export default function App() {
   }, [wakeTimeStr, currentTime]);
 
   const rec = useMemo(() => {
-    return recommendWakeTimes(currentTime, 6);
-  }, [currentTime]);
+    if (!hasUserSetWakeTime) return [];
+    return recommendNearbyWakeTimes(currentTime, wakeDate);
+  }, [currentTime, hasUserSetWakeTime, wakeDate]);
   const { setAlarmAt, clearAlarm } = useAlarm();
 
-  function handleRecommendationSelect(date) {
-    setWakeTimeStr(formatHHMM(date));
+  function handleWakeTimeChange(nextWakeTime) {
+    setWakeTimeStr(nextWakeTime);
+    setHasUserSetWakeTime(true);
+  }
+
+  function handleRecommendationSelect(recommendation) {
+    setWakeTimeStr(formatHHMM(roundToNearestFiveMinutes(recommendation.date)));
+    setHasUserSetWakeTime(true);
   }
 
   return (
@@ -53,12 +61,30 @@ export default function App() {
 
         <ClockDisplay />
 
-        <TimePicker value={wakeTimeStr} onChange={setWakeTimeStr} />
+        <TimePicker value={wakeTimeStr} onChange={handleWakeTimeChange} />
 
         <AlarmControls onSet={() => { setAlarmAt(wakeDate); alert('Alarm set'); }} onClear={() => { clearAlarm(); alert('Cleared'); }} />
 
-        <Recommendations times={rec} onSelect={handleRecommendationSelect} />
+        {hasUserSetWakeTime && <Recommendations times={rec} onSelect={handleRecommendationSelect} />}
       </main>
     </div>
   );
+}
+
+function roundToNextFiveMinutes(date) {
+  const rounded = new Date(date);
+  const minutes = rounded.getMinutes();
+  const nextMinutes = Math.ceil(minutes / 5) * 5;
+
+  rounded.setMinutes(nextMinutes, 0, 0);
+  return rounded;
+}
+
+function roundToNearestFiveMinutes(date) {
+  const rounded = new Date(date);
+  const minutes = rounded.getMinutes();
+  const nextMinutes = Math.round(minutes / 5) * 5;
+
+  rounded.setMinutes(nextMinutes, 0, 0);
+  return rounded;
 }

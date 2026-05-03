@@ -11,6 +11,21 @@ export function recommendWakeTimes(bedDate, count = 6, latency = DEFAULT_LATENCY
   return Array.from({ length: count }).map((_, i) => addMinutes(start, CYCLE_MIN * (i + 1)));
 }
 
+export function recommendNearbyWakeTimes(bedDate, wakeDate, latency = DEFAULT_LATENCY_MIN, cycle = CYCLE_MIN) {
+  const onset = addMinutes(bedDate, latency);
+  const deltaMin = Math.max(0, (wakeDate - onset) / MS_PER_MIN);
+  const cycleIndexBefore = Math.floor(deltaMin / cycle);
+  const boundaryBefore = addMinutes(onset, cycleIndexBefore * cycle);
+  const boundaryAfter = addMinutes(onset, (cycleIndexBefore + 1) * cycle);
+
+  return [
+    { date: addMinutes(boundaryBefore, -15), color: 'amber' },
+    { date: boundaryBefore, color: 'green' },
+    { date: boundaryAfter, color: 'green' },
+    { date: addMinutes(boundaryAfter, 15), color: 'amber' },
+  ];
+}
+
 export function classifyWakeTime(bedDate, wakeDate, latency = DEFAULT_LATENCY_MIN, cycle = CYCLE_MIN) {
   const onset = addMinutes(bedDate, latency);
   const deltaMin = (wakeDate - onset) / MS_PER_MIN;
