@@ -6,7 +6,7 @@
 }
 
 .tp-label {
-  color: #333333;
+  color: var(--muted);
   font-size: 0.9rem;
   font-weight: 800;
   text-align: center;
@@ -18,7 +18,7 @@
   align-items: center;
   gap: 12px;
   border-radius: 8px;
-  background: #000000;
+  background: var(--card-bg);
   padding: 14px 18px;
 }
 
@@ -37,7 +37,7 @@
   width: 100%;
   border: 0;
   background: transparent;
-  color: #ffffff;
+  color: var(--text);
   font-family: inherit;
   font-weight: 800;
   line-height: 1;
@@ -46,12 +46,12 @@
 }
 
 .wheel-option--active {
-  color: #ffffff;
+  color: var(--text);
   font-size: 3.9rem;
 }
 
 .wheel-option--dim {
-  color: #2f3035;
+  color: var(--dim);
   font-size: 2.7rem;
 }
 
@@ -66,7 +66,7 @@
 }
 
 .wheel-colon {
-  color: #ffffff;
+  color: var(--text);
   font-size: 3.5rem;
   font-weight: 800;
   line-height: 1;

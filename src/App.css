@@ -1,5 +1,7 @@
-:root { --bg: #fff; --muted:#6b7280; }
-.app { max-width:420px; margin:18px auto; padding:12px; }
+/* theme variables moved to index.css */
+.app { max-width:420px; margin:18px auto; padding:12px; } 
+.app-header { display:flex; align-items:center; justify-content:center; gap:12px; position:relative; }
+.theme-toggle { position:absolute; right:4px; top:8px; border:0; background:transparent; font-size:1.1rem; cursor:pointer; }
 .app-header { text-align:center; }
 .ring-wrap { display:flex; justify-content:center; margin:10px 0; }
 .app-main { padding:8px; }
@@ -14,19 +16,19 @@
 
 .display-toggle {
   min-height: 36px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: #ffffff;
-  color: #374151;
+  background: var(--control-bg);
+  color: var(--text);
   font: inherit;
   font-size: 0.8rem;
   font-weight: 800;
 }
 
 .display-toggle--active {
-  border-color: #111827;
-  background: #111827;
-  color: #ffffff;
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--card-bg);
 }
 
 .rag-toggles {
