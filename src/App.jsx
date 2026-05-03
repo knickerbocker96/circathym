@@ -16,6 +16,8 @@ export default function App() {
     return formatHHMM(roundToNextFiveMinutes(t));
   });
   const [hasUserSetWakeTime, setHasUserSetWakeTime] = useState(false);
+  const [recommendationAnchor, setRecommendationAnchor] = useState(null);
+  const [selectedRecommendationKey, setSelectedRecommendationKey] = useState(null);
 
   useEffect(() => {
     function tick() {
@@ -33,19 +35,39 @@ export default function App() {
   }, [wakeTimeStr, currentTime]);
 
   const rec = useMemo(() => {
-    if (!hasUserSetWakeTime) return [];
-    return recommendNearbyWakeTimes(currentTime, wakeDate);
-  }, [currentTime, hasUserSetWakeTime, wakeDate]);
+    if (!hasUserSetWakeTime || !recommendationAnchor) return [];
+
+    return recommendNearbyWakeTimes(recommendationAnchor.bedDate, recommendationAnchor.wakeDate)
+      .filter((item) => getRecommendationKey(item.date) !== selectedRecommendationKey);
+  }, [hasUserSetWakeTime, recommendationAnchor, selectedRecommendationKey]);
   const { setAlarmAt, clearAlarm } = useAlarm();
 
   function handleWakeTimeChange(nextWakeTime) {
+    const nextWakeDate = getNextTimeInTimeZone(nextWakeTime, currentTime);
+
     setWakeTimeStr(nextWakeTime);
     setHasUserSetWakeTime(true);
+    setRecommendationAnchor({
+      bedDate: new Date(currentTime),
+      wakeDate: nextWakeDate,
+    });
+    setSelectedRecommendationKey(null);
   }
 
   function handleRecommendationSelect(recommendation) {
-    setWakeTimeStr(formatHHMM(roundToNearestFiveMinutes(recommendation.date)));
+    const roundedDate = roundToNearestFiveMinutes(recommendation.date);
+
+    setWakeTimeStr(formatHHMM(roundedDate));
     setHasUserSetWakeTime(true);
+    setSelectedRecommendationKey(getRecommendationKey(roundedDate));
+  }
+
+  function handleClear() {
+    clearAlarm();
+    setHasUserSetWakeTime(false);
+    setRecommendationAnchor(null);
+    setSelectedRecommendationKey(null);
+    alert('Cleared');
   }
 
   return (
@@ -65,10 +87,14 @@ export default function App() {
 
         {hasUserSetWakeTime && <Recommendations times={rec} onSelect={handleRecommendationSelect} />}
 
-        <AlarmControls onSet={() => { setAlarmAt(wakeDate); alert('Alarm set'); }} onClear={() => { clearAlarm(); alert('Cleared'); }} />
+        <AlarmControls onSet={() => { setAlarmAt(wakeDate); alert('Alarm set'); }} onClear={handleClear} />
       </main>
     </div>
   );
+}
+
+function getRecommendationKey(date) {
+  return formatHHMM(roundToNearestFiveMinutes(date));
 }
 
 function roundToNextFiveMinutes(date) {
