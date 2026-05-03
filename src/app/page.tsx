@@ -503,6 +503,44 @@ export default function Home() {
                 >
                   <button
                     type="button"
+                    aria-expanded={showWakeLogger}
+                    onClick={() => setShowWakeLogger(v => !v)}
+                    className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
+                  >
+                    <span aria-hidden="true" />
+                    <h2 className="text-[17px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--foreground)' }}>
+                      Log
+                    </h2>
+                    <span
+                      className="justify-self-end text-[13px] font-semibold transition-transform duration-200"
+                      style={{
+                        color: 'var(--apple-blue)',
+                        transform: showWakeLogger ? 'rotate(180deg)' : 'rotate(0deg)',
+                        display: 'inline-block',
+                      }}
+                    >
+                      ▾
+                    </span>
+                  </button>
+
+                  {showWakeLogger && (
+                    <div className="p-4" style={{ borderTop: '1px solid var(--apple-separator)' }}>
+                      <WakeLogger
+                        defaultBedtime={defaultLogBedtime}
+                        defaultWaketime={defaultLogWaketime}
+                        onLog={handleLogSleep}
+                        onDismiss={() => setShowWakeLogger(false)}
+                      />
+                    </div>
+                  )}
+                </section>
+
+                <section
+                  className="overflow-hidden rounded-2xl bg-card card-shadow"
+                  style={{ border: '1px solid var(--apple-separator)' }}
+                >
+                  <button
+                    type="button"
                     aria-expanded={showSuggestions}
                     onClick={() => setShowSuggestions(v => !v)}
                     className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
@@ -540,25 +578,6 @@ export default function Home() {
 
                 {sleepLog.length >= 5 && (
                   <InsightCard personalCycleLength={personalCycleLength} sleepLog={sleepLog} />
-                )}
-
-                {showWakeLogger ? (
-                  <WakeLogger
-                    defaultBedtime={defaultLogBedtime}
-                    defaultWaketime={defaultLogWaketime}
-                    onLog={handleLogSleep}
-                    onDismiss={() => setShowWakeLogger(false)}
-                  />
-                ) : (
-                  <div className="text-center">
-                    <button
-                      onClick={() => setShowWakeLogger(true)}
-                      className="text-[13px] font-medium transition-colors"
-                      style={{ color: 'var(--apple-blue)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                    >
-                      Log last night&apos;s wake quality
-                    </button>
-                  </div>
                 )}
 
               </div>
