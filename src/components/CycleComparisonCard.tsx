@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { classifyWakeTime } from '@/logic/sleepCycle';
 import { getCycleConfidence } from '@/logic/cyclePersonalization';
 import { formatTime12 } from '@/utils/timeUtils';
@@ -193,7 +192,7 @@ export default function CycleComparisonCard({ personalCycleLength, sleepLog, bed
             ↑ {improvement}m closer to your real cycle boundary
           </p>
           <p className="text-[11px] font-medium mt-0.5" style={{ color: '#34C759', opacity: 0.75 }}>
-            That's the difference personalization makes.
+            That&apos;s the difference personalization makes.
           </p>
         </div>
       )}

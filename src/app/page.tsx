@@ -18,9 +18,42 @@ import { formatHHMM, formatTime12, getNextTimeInTimeZone } from '@/utils/timeUti
 
 const DEFAULT_ALARM_SETTINGS = { tone: 'gentle', volume: 0.65, fadeIn: true };
 
+type SleepLogEntry = {
+  bedtime: string;
+  waketime: string;
+  rating: number;
+  ts?: number;
+  demo?: boolean;
+};
+
+function getInitialDarkMode() {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    const saved = localStorage.getItem('theme');
+    return saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } catch {
+    return false;
+  }
+}
+
+function getInitialAlarmSettings() {
+  if (typeof window === 'undefined') return DEFAULT_ALARM_SETTINGS;
+
+  try {
+    return { ...DEFAULT_ALARM_SETTINGS, ...JSON.parse(localStorage.getItem('alarmSettings') || '{}') };
+  } catch {
+    return DEFAULT_ALARM_SETTINGS;
+  }
+}
+
+function getInitialWakeTime() {
+  return formatHHMM(roundToNext5(new Date(Date.now() + 7 * 3600 * 1000)));
+}
+
 export default function Home() {
-  const [currentTime, setCurrentTime] = useState(() => new Date(0));
-  const [wakeTimeStr, setWakeTimeStr] = useState('07:00');
+  const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [wakeTimeStr, setWakeTimeStr] = useState(getInitialWakeTime);
   const [hasUserSetWakeTime, setHasUserSetWakeTime] = useState(false);
   const [recommendationAnchor, setRecommendationAnchor] = useState<{ bedDate: Date; wakeDate: Date } | null>(null);
   const [selectedRecKey, setSelectedRecKey] = useState<string | null>(null);
@@ -30,12 +63,15 @@ export default function Home() {
   const [showGreen, setShowGreen] = useState(true);
   const [alarmEnabled, setAlarmEnabled] = useState(false);
   const [snoozeEnabled, setSnoozeEnabled] = useState(false);
-  const [alarmSettings, setAlarmSettings] = useState(DEFAULT_ALARM_SETTINGS);
+  const [alarmSettings, setAlarmSettings] = useState(getInitialAlarmSettings);
   const [isRinging, setIsRinging] = useState(false);
   const [scheduledAlarmDate, setScheduledAlarmDate] = useState<Date | null>(null);
   const [showWakeLogger, setShowWakeLogger] = useState(false);
-  const [sleepLog, setSleepLog] = useState<any[]>([]);
-  const [darkMode, setDarkMode] = useState(false);
+  const [sleepLog, setSleepLog] = useState<SleepLogEntry[]>(() => {
+    if (typeof window === 'undefined') return [];
+    return getSleepLog();
+  });
+  const [darkMode, setDarkMode] = useState(getInitialDarkMode);
   const [showUserAnalytics, setShowUserAnalytics] = useState(false);
 
   const [mounted, setMounted] = useState(false);
@@ -54,24 +90,12 @@ export default function Home() {
   }, [alarmSettings, mounted]);
 
   useEffect(() => {
-    setSleepLog(getSleepLog());
-    setDarkMode(() => {
-      try {
-        const saved = localStorage.getItem('theme');
-        return saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-      } catch { return false; }
-    });
-    setAlarmSettings((prev) => {
-      try {
-        return { ...prev, ...JSON.parse(localStorage.getItem('alarmSettings') || '{}') };
-      } catch { return prev; }
-    });
-    setWakeTimeStr(formatHHMM(roundToNext5(new Date(Date.now() + 7 * 3600 * 1000))));
-    setCurrentTime(new Date());
-
-    queueMicrotask(() => setMounted(true));
+    const mountId = window.setTimeout(() => setMounted(true), 0);
     const id = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(id);
+    return () => {
+      window.clearTimeout(mountId);
+      clearInterval(id);
+    };
   }, []);
 
   const personalCycleLength = useMemo(() => derivePersonalCycleLength(sleepLog), [sleepLog]);
