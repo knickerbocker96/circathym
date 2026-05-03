@@ -41,7 +41,7 @@ export default function Recommendations({ times, onSelect, cycleLength, bedDate 
               className="min-h-[60px] rounded-2xl px-3 py-3 text-left transition-all duration-150 active:scale-[0.97]"
               style={{ background: c.bg, border: `1.5px solid ${c.border}` }}
             >
-              <span className="block text-[17px] font-semibold" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif', fontVariantNumeric: 'tabular-nums', color: c.text }}>
+              <span className="block text-[17px] font-semibold" style={{ fontFamily: 'var(--code-font)', fontVariantNumeric: 'tabular-nums', color: c.text }}>
                 {formatTime12(item.date)}
               </span>
               <span className="block text-[11px] font-medium mt-0.5" style={{ color: c.text, opacity: 0.7 }}>

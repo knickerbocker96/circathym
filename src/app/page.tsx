@@ -19,10 +19,8 @@ import { formatHHMM, formatTime12, getNextTimeInTimeZone } from '@/utils/timeUti
 const DEFAULT_ALARM_SETTINGS = { tone: 'gentle', volume: 0.65, fadeIn: true };
 
 export default function Home() {
-  const [currentTime, setCurrentTime] = useState(() => new Date());
-  const [wakeTimeStr, setWakeTimeStr] = useState(() =>
-    formatHHMM(roundToNext5(new Date(Date.now() + 7 * 3600 * 1000)))
-  );
+  const [currentTime, setCurrentTime] = useState(() => new Date(0));
+  const [wakeTimeStr, setWakeTimeStr] = useState('07:00');
   const [hasUserSetWakeTime, setHasUserSetWakeTime] = useState(false);
   const [recommendationAnchor, setRecommendationAnchor] = useState<{ bedDate: Date; wakeDate: Date } | null>(null);
   const [selectedRecKey, setSelectedRecKey] = useState<string | null>(null);
@@ -32,36 +30,45 @@ export default function Home() {
   const [showGreen, setShowGreen] = useState(true);
   const [alarmEnabled, setAlarmEnabled] = useState(false);
   const [snoozeEnabled, setSnoozeEnabled] = useState(false);
-  const [alarmSettings, setAlarmSettings] = useState(() => {
-    if (typeof window === 'undefined') return DEFAULT_ALARM_SETTINGS;
-    try {
-      return { ...DEFAULT_ALARM_SETTINGS, ...JSON.parse(localStorage.getItem('alarmSettings') || '{}') };
-    } catch { return DEFAULT_ALARM_SETTINGS; }
-  });
+  const [alarmSettings, setAlarmSettings] = useState(DEFAULT_ALARM_SETTINGS);
   const [isRinging, setIsRinging] = useState(false);
   const [scheduledAlarmDate, setScheduledAlarmDate] = useState<Date | null>(null);
   const [showWakeLogger, setShowWakeLogger] = useState(false);
-  const [sleepLog, setSleepLog] = useState(() => getSleepLog());
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      const saved = localStorage.getItem('theme');
-      return saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-    } catch { return false; }
-  });
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode);
-    try { localStorage.setItem('theme', darkMode ? 'dark' : 'light'); } catch {}
-  }, [darkMode]);
-
-  useEffect(() => {
-    try { localStorage.setItem('alarmSettings', JSON.stringify(alarmSettings)); } catch {}
-  }, [alarmSettings]);
+  const [sleepLog, setSleepLog] = useState<any[]>([]);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showUserAnalytics, setShowUserAnalytics] = useState(false);
 
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    if (mounted) {
+      try { localStorage.setItem('theme', darkMode ? 'dark' : 'light'); } catch {}
+    }
+  }, [darkMode, mounted]);
+
+  useEffect(() => {
+    if (mounted) {
+      try { localStorage.setItem('alarmSettings', JSON.stringify(alarmSettings)); } catch {}
+    }
+  }, [alarmSettings, mounted]);
+
+  useEffect(() => {
+    setSleepLog(getSleepLog());
+    setDarkMode(() => {
+      try {
+        const saved = localStorage.getItem('theme');
+        return saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } catch { return false; }
+    });
+    setAlarmSettings((prev) => {
+      try {
+        return { ...prev, ...JSON.parse(localStorage.getItem('alarmSettings') || '{}') };
+      } catch { return prev; }
+    });
+    setWakeTimeStr(formatHHMM(roundToNext5(new Date(Date.now() + 7 * 3600 * 1000))));
+    setCurrentTime(new Date());
+
     queueMicrotask(() => setMounted(true));
     const id = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(id);
@@ -147,6 +154,7 @@ export default function Home() {
     setRecommendationAnchor({ bedDate, wakeDate: demoWake });
     setSelectedRecKey(null);
     setIsRinging(false);
+    setShowUserAnalytics(true);
   }
 
   function resetDemoProfile() {
@@ -155,6 +163,7 @@ export default function Home() {
     setHasUserSetWakeTime(false);
     setRecommendationAnchor(null);
     setSelectedRecKey(null);
+    setShowUserAnalytics(false);
   }
 
   function handleWakeTimeChange(next: string) {
@@ -303,28 +312,60 @@ export default function Home() {
           </div>
         ) : (
           <>
-            {/* ── Stats row ── */}
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-              <Metric
-                label="Cycle"
-                value={`${activeCycleLength}m`}
-                note={personalCycleLength ? 'learned' : 'default'}
-              />
-              <Metric
-                label="Confidence"
-                value={cycleConfidence.label}
-                note={cycleConfidence.reason}
-              />
-              <Metric
-                label="Best Wake"
-                value={`${formatTime12(bestWakeWindow.start)}–${formatTime12(bestWakeWindow.end)}`}
-                note="personal window"
-              />
-              <Metric
-                label="Sleep Debt"
-                value={sleepDebt.label}
-                note={sleepDebt.averageHours ? `${sleepDebt.averageHours}h avg` : 'needs logs'}
-              />
+            {/* User Analytics */}
+            <section
+              className="mb-5 overflow-hidden rounded-2xl bg-card card-shadow"
+              style={{ border: '1px solid var(--apple-separator)' }}
+            >
+              <button
+                type="button"
+                aria-expanded={showUserAnalytics}
+                onClick={() => setShowUserAnalytics(v => !v)}
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors"
+              >
+                <div>
+                  <h2 className="text-[17px] font-bold tracking-normal" style={{ color: 'var(--foreground)' }}>
+                    User Analytics
+                  </h2>
+                </div>
+                <span
+                  className="shrink-0 rounded-full px-3 py-1 text-[12px] font-semibold"
+                  style={{
+                    background: 'var(--apple-fill)',
+                    color: 'var(--muted-foreground)',
+                  }}
+                >
+                  {showUserAnalytics ? 'Hide' : 'View'}
+                </span>
+              </button>
+
+              {showUserAnalytics && (
+                <div
+                  className="grid grid-cols-2 gap-3 p-4 md:grid-cols-4"
+                  style={{ borderTop: '1px solid var(--apple-separator)' }}
+                >
+                  <Metric
+                    label="Cycle"
+                    value={`${activeCycleLength}m`}
+                    note={personalCycleLength ? 'learned' : 'default'}
+                  />
+                  <Metric
+                    label="Confidence"
+                    value={cycleConfidence.label}
+                    note={cycleConfidence.reason}
+                  />
+                  <Metric
+                    label="Best Wake"
+                    value={`${formatTime12(bestWakeWindow.start)}–${formatTime12(bestWakeWindow.end)}`}
+                    note="personal window"
+                  />
+                  <Metric
+                    label="Sleep Debt"
+                    value={sleepDebt.label}
+                    note={sleepDebt.averageHours ? `${sleepDebt.averageHours}h avg` : 'needs logs'}
+                  />
+                </div>
+              )}
             </section>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -348,7 +389,7 @@ export default function Home() {
                       showGreenStages={showGreen}
                       cycleMinutes={activeCycleLength}
                       wakeClassification={wakeClassification}
-                      size={300}
+                      size={280}
                     />
                   </div>
 
@@ -381,6 +422,16 @@ export default function Home() {
                       : 'Default 90m cycle — log 3 wakes to personalize'}
                   </p>
                 </div>
+
+                {/* Moved Recommendations here for better visibility */}
+                {hasUserSetWakeTime && rec.length > 0 && (
+                  <Recommendations
+                    times={rec}
+                    onSelect={handleRecommendationSelect}
+                    cycleLength={activeCycleLength}
+                    bedDate={recommendationAnchor?.bedDate ?? null}
+                  />
+                )}
 
                 {/* Wake time picker */}
                 <div
@@ -425,15 +476,6 @@ export default function Home() {
 
                 {sleepLog.length >= 5 && (
                   <InsightCard personalCycleLength={personalCycleLength} sleepLog={sleepLog} />
-                )}
-
-                {hasUserSetWakeTime && rec.length > 0 && (
-                  <Recommendations
-                    times={rec}
-                    onSelect={handleRecommendationSelect}
-                    cycleLength={activeCycleLength}
-                    bedDate={recommendationAnchor?.bedDate ?? null}
-                  />
                 )}
 
                 {showWakeLogger ? (

@@ -94,7 +94,7 @@ export default function AlarmControls({
             <p className="text-[11px] font-semibold tracking-[0.06em] uppercase" style={{ color: 'var(--muted-foreground)' }}>
               Volume
             </p>
-            <p className="text-[11px] font-semibold" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif', fontVariantNumeric: 'tabular-nums', color: 'var(--apple-blue)' }}>
+            <p className="text-[11px] font-semibold" style={{ fontFamily: 'var(--code-font)', fontVariantNumeric: 'tabular-nums', color: 'var(--apple-blue)' }}>
               {Math.round(alarmSettings.volume * 100)}%
             </p>
           </div>

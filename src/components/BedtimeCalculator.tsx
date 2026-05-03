@@ -64,7 +64,7 @@ export default function BedtimeCalculator({ personalCycleLength, onUsePlan }: Pr
               onChange={e => setWakeBy(e.target.value)}
               className="w-full h-10 px-3 rounded-xl text-[15px] font-semibold"
               style={{
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif',
+                fontFamily: 'var(--code-font)',
                 fontVariantNumeric: 'tabular-nums',
                 background: 'var(--secondary)',
                 border: '1px solid var(--apple-separator)',
@@ -99,7 +99,7 @@ export default function BedtimeCalculator({ personalCycleLength, onUsePlan }: Pr
                 }}
               >
                 <span>
-                  <span className="block text-[17px] font-semibold" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif', fontVariantNumeric: 'tabular-nums', color: 'var(--foreground)' }}>
+                  <span className="block text-[17px] font-semibold" style={{ fontFamily: 'var(--code-font)', fontVariantNumeric: 'tabular-nums', color: 'var(--foreground)' }}>
                     {formatTime12(bedDate)}
                   </span>
                   <span className="block text-[11px] font-medium mt-0.5" style={{ color: 'var(--muted-foreground)' }}>

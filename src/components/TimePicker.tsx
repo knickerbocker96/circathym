@@ -6,7 +6,7 @@ const STEP = 5;
 const pad = (n: number) => String(n).padStart(2, '0');
 
 const SF_DISPLAY: React.CSSProperties = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif',
+  fontFamily: 'var(--code-font)',
   fontVariantNumeric: 'tabular-nums',
 };
 

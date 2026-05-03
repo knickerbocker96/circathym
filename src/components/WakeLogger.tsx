@@ -104,7 +104,7 @@ function TimeField({ label, value, onChange }: { label: string; value: string; o
         onChange={e => onChange(e.target.value)}
         className="w-full h-10 px-3 rounded-xl text-[13px] font-semibold"
         style={{
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif',
+          fontFamily: 'var(--code-font)',
           fontVariantNumeric: 'tabular-nums',
           background: 'var(--secondary)',
           border: '1px solid var(--apple-separator)',

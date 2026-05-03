@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -5,7 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-mono: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -65,6 +66,7 @@
   --card-bg: #FFFFFF;
   --text: #000000;
   --dim: rgba(60, 60, 67, 0.28);
+  --app-font: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* ── Dark: true OLED black + elevated surfaces ── */
@@ -101,13 +103,24 @@
   --card-bg: #1C1C1E;
   --text: #FFFFFF;
   --dim: rgba(235, 235, 245, 0.28);
+  --app-font: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 @layer base {
-  * { @apply border-border outline-ring/50; }
+  * {
+    @apply border-border outline-ring/50;
+    font-family: var(--app-font);
+  }
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--app-font);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-family: var(--app-font);
   }
 }
 

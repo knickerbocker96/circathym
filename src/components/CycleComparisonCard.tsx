@@ -62,7 +62,7 @@ export default function CycleComparisonCard({ personalCycleLength, sleepLog, bed
             <span className="text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ color: 'var(--muted-foreground)' }}>
               Quality wakes logged
             </span>
-            <span className="text-[11px] font-semibold" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif', fontVariantNumeric: 'tabular-nums', color: 'var(--apple-blue)' }}>
+            <span className="text-[11px] font-semibold" style={{ fontFamily: 'var(--code-font)', fontVariantNumeric: 'tabular-nums', color: 'var(--apple-blue)' }}>
               {progress} / {UNLOCK_AT}
             </span>
           </div>
@@ -132,7 +132,7 @@ export default function CycleComparisonCard({ personalCycleLength, sleepLog, bed
           <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-3" style={{ color: 'var(--muted-foreground)' }}>
             Generic 90m
           </p>
-          <p className="text-[15px] font-semibold mb-2" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif', fontVariantNumeric: 'tabular-nums', color: 'var(--foreground)' }}>
+          <p className="text-[15px] font-semibold mb-2" style={{ fontFamily: 'var(--code-font)', fontVariantNumeric: 'tabular-nums', color: 'var(--foreground)' }}>
             {formatTime12(wakeDate)}
           </p>
           <div
@@ -165,7 +165,7 @@ export default function CycleComparisonCard({ personalCycleLength, sleepLog, bed
               {cyclesLabel}
             </span>
           </div>
-          <p className="text-[15px] font-semibold mb-2" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif', fontVariantNumeric: 'tabular-nums', color: 'var(--foreground)' }}>
+          <p className="text-[15px] font-semibold mb-2" style={{ fontFamily: 'var(--code-font)', fontVariantNumeric: 'tabular-nums', color: 'var(--foreground)' }}>
             {formatTime12(wakeDate)}
           </p>
           <div
