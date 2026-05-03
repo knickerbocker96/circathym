@@ -7,9 +7,14 @@ export default function Recommendations({ times = [], onSelect }) {
     <div className="recommendations">
       <strong>Recommended Wake Times</strong>
       <div className="recommendations-list">
-        {times.map((t, i) => (
-          <button key={i} className="recommendation-button" type="button" onClick={() => onSelect?.(t)}>
-            {formatTime12(t)}
+        {times.map((item, i) => (
+          <button
+            key={i}
+            className={`recommendation-button recommendation-button--${item.color}`}
+            type="button"
+            onClick={() => onSelect?.(item)}
+          >
+            {formatTime12(item.date)}
           </button>
         ))}
       </div>

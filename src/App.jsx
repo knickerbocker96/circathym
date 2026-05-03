@@ -63,9 +63,9 @@ export default function App() {
 
         <TimePicker value={wakeTimeStr} onChange={handleWakeTimeChange} />
 
-        <AlarmControls onSet={() => { setAlarmAt(wakeDate); alert('Alarm set'); }} onClear={() => { clearAlarm(); alert('Cleared'); }} />
-
         {hasUserSetWakeTime && <Recommendations times={rec} onSelect={handleRecommendationSelect} />}
+
+        <AlarmControls onSet={() => { setAlarmAt(wakeDate); alert('Alarm set'); }} onClear={() => { clearAlarm(); alert('Cleared'); }} />
       </main>
     </div>
   );
