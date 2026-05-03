@@ -210,3 +210,4 @@ function roundToNearestFiveMinutes(date) {
   rounded.setMinutes(nextMinutes, 0, 0);
   return rounded;
 }
+
