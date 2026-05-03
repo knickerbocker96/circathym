@@ -78,6 +78,7 @@ export default function Home() {
   const activeCycleLength = personalCycleLength || 90;
   const cycleConfidence = useMemo(() => getCycleConfidence(sleepLog), [sleepLog]);
   const sleepDebt = useMemo(() => getSleepDebt(sleepLog), [sleepLog]);
+  const hasSleepHistory = sleepLog.length > 0;
   const bestWakeWindow = useMemo(() => getBestWakeWindow(personalCycleLength), [personalCycleLength]);
   const selectedWakeDate = useMemo(() => getNextTimeInTimeZone(wakeTimeStr, currentTime), [wakeTimeStr, currentTime]);
   const wakeDate = scheduledAlarmDate || selectedWakeDate;
@@ -321,15 +322,14 @@ export default function Home() {
                 type="button"
                 aria-expanded={showUserAnalytics}
                 onClick={() => setShowUserAnalytics(v => !v)}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors"
+                className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-4 text-center transition-colors"
               >
-                <div>
-                  <h2 className="text-[17px] font-bold tracking-normal" style={{ color: 'var(--foreground)' }}>
-                    User Analytics
-                  </h2>
-                </div>
+                <span aria-hidden="true" />
+                <h2 className="text-[17px] font-bold tracking-normal" style={{ color: 'var(--foreground)' }}>
+                  Analytics
+                </h2>
                 <span
-                  className="shrink-0 rounded-full px-3 py-1 text-[12px] font-semibold"
+                  className="justify-self-end rounded-full px-3 py-1 text-[12px] font-semibold"
                   style={{
                     background: 'var(--apple-fill)',
                     color: 'var(--muted-foreground)',
@@ -346,23 +346,27 @@ export default function Home() {
                 >
                   <Metric
                     label="Cycle"
-                    value={`${activeCycleLength}m`}
-                    note={personalCycleLength ? 'learned' : 'default'}
+                    value={hasSleepHistory ? `${activeCycleLength}m` : '--'}
+                    note={personalCycleLength ? 'learned' : undefined}
+                    muted={!hasSleepHistory}
                   />
                   <Metric
                     label="Confidence"
-                    value={cycleConfidence.label}
-                    note={cycleConfidence.reason}
+                    value={hasSleepHistory ? cycleConfidence.label : '--'}
+                    note={hasSleepHistory ? cycleConfidence.reason : undefined}
+                    muted={!hasSleepHistory}
                   />
                   <Metric
                     label="Best Wake"
-                    value={`${formatTime12(bestWakeWindow.start)}–${formatTime12(bestWakeWindow.end)}`}
-                    note="personal window"
+                    value={hasSleepHistory ? `${formatTime12(bestWakeWindow.start)}–${formatTime12(bestWakeWindow.end)}` : '--'}
+                    note={personalCycleLength ? 'personal window' : undefined}
+                    muted={!hasSleepHistory}
                   />
                   <Metric
                     label="Sleep Debt"
-                    value={sleepDebt.label}
-                    note={sleepDebt.averageHours ? `${sleepDebt.averageHours}h avg` : 'needs logs'}
+                    value={hasSleepHistory ? sleepDebt.label : '--'}
+                    note={sleepDebt.averageHours ? `${sleepDebt.averageHours}h avg` : undefined}
+                    muted={!hasSleepHistory}
                   />
                 </div>
               )}
@@ -570,7 +574,7 @@ function RagBtn({ color, active, onClick, children }: {
 }
 
 /* ── Stats metric card ── */
-function Metric({ label, value, note }: { label: string; value: string; note: string }) {
+function Metric({ label, value, note, muted = false }: { label: string; value: string; note?: string; muted?: boolean }) {
   return (
     <div
       className="rounded-2xl bg-card card-shadow px-4 py-3 text-center"
@@ -579,12 +583,20 @@ function Metric({ label, value, note }: { label: string; value: string; note: st
       <p className="text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--muted-foreground)' }}>
         {label}
       </p>
-      <p className="text-[17px] font-semibold leading-tight mt-0.5" style={{ color: 'var(--foreground)' }}>
+      <p
+        className="text-[17px] font-semibold leading-tight mt-0.5"
+        style={{
+          color: muted ? 'var(--muted-foreground)' : 'var(--foreground)',
+          opacity: muted ? 0.55 : 1,
+        }}
+      >
         {value}
       </p>
-      <p className="text-[11px] font-medium mt-0.5 truncate" style={{ color: 'var(--apple-blue)' }}>
-        {note}
-      </p>
+      {note && (
+        <p className="text-[11px] font-medium mt-0.5 truncate" style={{ color: 'var(--muted-foreground)' }}>
+          {note}
+        </p>
+      )}
     </div>
   );
 }

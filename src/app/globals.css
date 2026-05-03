@@ -67,6 +67,7 @@
   --text: #000000;
   --dim: rgba(60, 60, 67, 0.28);
   --app-font: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --code-font: var(--app-font);
 }
 
 /* ── Dark: true OLED black + elevated surfaces ── */
@@ -104,6 +105,7 @@
   --text: #FFFFFF;
   --dim: rgba(235, 235, 245, 0.28);
   --app-font: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --code-font: var(--app-font);
 }
 
 @layer base {
