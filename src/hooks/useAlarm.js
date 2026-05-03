@@ -1,9 +1,16 @@
 import { useRef, useEffect } from 'react';
 
-function playBeep(duration = 3000) {
+function playBeep(audioContextRef, duration = 3000) {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const ctx = new AudioContext();
+    const ctx = audioContextRef.current || new AudioContext();
+    const shouldCloseContext = !audioContextRef.current;
+
+    audioContextRef.current = ctx;
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+
     const o = ctx.createOscillator();
     const g = ctx.createGain();
     o.type = 'sine';
@@ -12,27 +19,58 @@ function playBeep(duration = 3000) {
     o.connect(g);
     g.connect(ctx.destination);
     o.start();
-    setTimeout(() => { o.stop(); ctx.close(); }, duration);
+    setTimeout(() => {
+      o.stop();
+      if (shouldCloseContext) ctx.close();
+    }, duration);
   } catch (e) {
     const a = new Audio();
     a.play().catch(() => {});
   }
 }
 
-export default function useAlarm() {
+export default function useAlarm(onRing) {
   const cancelRef = useRef(null);
+  const onRingRef = useRef(onRing);
+  const audioContextRef = useRef(null);
 
-  useEffect(() => () => { if (cancelRef.current) cancelRef.current(); }, []);
+  useEffect(() => () => {
+    if (cancelRef.current) cancelRef.current();
+    if (audioContextRef.current) audioContextRef.current.close();
+  }, []);
+
+  useEffect(() => {
+    onRingRef.current = onRing;
+  }, [onRing]);
+
+  function triggerAlarm() {
+    playBeep(audioContextRef);
+    if (onRingRef.current) onRingRef.current();
+  }
+
+  function unlockAlarmSound() {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume();
+      }
+    } catch (e) {}
+  }
 
   function setAlarmAt(date) {
+    unlockAlarmSound();
     if (cancelRef.current) cancelRef.current();
+    cancelRef.current = null;
     const ms = date - new Date();
-    if (ms <= 0) { playBeep(); return; }
-    const id = setTimeout(() => { playBeep(); cancelRef.current = null; }, ms);
+    if (ms <= 0) { triggerAlarm(); return; }
+    const id = setTimeout(() => { triggerAlarm(); cancelRef.current = null; }, ms);
     cancelRef.current = () => clearTimeout(id);
   }
 
   function clearAlarm() { if (cancelRef.current) { cancelRef.current(); cancelRef.current = null; } }
 
-  return { setAlarmAt, clearAlarm };
+  return { setAlarmAt, clearAlarm, unlockAlarmSound };
 }

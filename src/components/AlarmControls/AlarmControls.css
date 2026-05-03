@@ -1,3 +1,83 @@
-.alarm-controls { display:flex; gap:8px; justify-content:center; margin-top:8px; }
-.btn { padding:8px 12px; border-radius:8px; border:0; background:var(--btn-bg); color:var(--btn-color); font-weight:600; }
-.btn.muted { background:var(--btn-muted-bg); color:var(--btn-muted-color); }
+.alarm-controls {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  margin: 12px auto 0;
+  width: min(100%, 300px);
+}
+
+.alarm-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.alarm-toggle,
+.btn,
+.snooze-option {
+  min-height: 36px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.alarm-toggle {
+  border: 1px solid var(--border);
+  background: var(--control-bg);
+  color: var(--text);
+}
+
+.alarm-toggle--active {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--card-bg);
+}
+
+.ringing-panel {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--control-bg);
+  box-sizing: border-box;
+}
+
+.ringing-label {
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.snooze-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.snooze-option {
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+.snooze-option:hover {
+  border-color: var(--accent);
+}
+
+.btn {
+  padding: 8px 12px;
+  border: 0;
+  background: var(--btn-bg);
+  color: var(--btn-color);
+}
+
+.btn.muted {
+  background: var(--btn-muted-bg);
+  color: var(--btn-muted-color);
+}
