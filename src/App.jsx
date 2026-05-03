@@ -9,6 +9,8 @@ import { recommendNearbyWakeTimes } from './logic/sleepCycle';
 import useAlarm from './hooks/useAlarm';
 import { formatHHMM, getNextTimeInTimeZone } from './utils/timeUtils';
 
+const SNOOZE_OPTIONS = [5, 10, 15, 20, 30];
+
 export default function App() {
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [wakeTimeStr, setWakeTimeStr] = useState(() => {
@@ -18,11 +20,14 @@ export default function App() {
   const [hasUserSetWakeTime, setHasUserSetWakeTime] = useState(false);
   const [recommendationAnchor, setRecommendationAnchor] = useState(null);
   const [selectedRecommendationKey, setSelectedRecommendationKey] = useState(null);
-  const [showCycleBoundaries, setShowCycleBoundaries] = useState(false);
-  const [showStageMarkers, setShowStageMarkers] = useState(false);
-  const [showRedStages, setShowRedStages] = useState(false);
-  const [showAmberStages, setShowAmberStages] = useState(false);
-  const [showGreenStages, setShowGreenStages] = useState(false);
+  const [showCycleBoundaries, setShowCycleBoundaries] = useState(true);
+  const [showRedStages, setShowRedStages] = useState(true);
+  const [showAmberStages, setShowAmberStages] = useState(true);
+  const [showGreenStages, setShowGreenStages] = useState(true);
+  const [alarmEnabled, setAlarmEnabled] = useState(false);
+  const [snoozeEnabled, setSnoozeEnabled] = useState(false);
+  const [isRinging, setIsRinging] = useState(false);
+  const [scheduledAlarmDate, setScheduledAlarmDate] = useState(null);
   const [darkMode, setDarkMode] = useState(() => {
     try {
       const saved = localStorage.getItem('theme');
@@ -48,9 +53,11 @@ export default function App() {
     return () => clearInterval(id);
   }, []);
 
-  const wakeDate = useMemo(() => {
+  const selectedWakeDate = useMemo(() => {
     return getNextTimeInTimeZone(wakeTimeStr, currentTime);
   }, [wakeTimeStr, currentTime]);
+  const wakeDate = scheduledAlarmDate || selectedWakeDate;
+  const showStageMarkers = showRedStages || showAmberStages || showGreenStages;
 
   const rec = useMemo(() => {
     if (!hasUserSetWakeTime || !recommendationAnchor) return [];
@@ -58,7 +65,11 @@ export default function App() {
     return recommendNearbyWakeTimes(recommendationAnchor.bedDate, recommendationAnchor.wakeDate)
       .filter((item) => getRecommendationKey(item.date) !== selectedRecommendationKey);
   }, [hasUserSetWakeTime, recommendationAnchor, selectedRecommendationKey]);
-  const { setAlarmAt, clearAlarm } = useAlarm();
+  const { setAlarmAt, clearAlarm, unlockAlarmSound } = useAlarm(() => {
+    setIsRinging(true);
+    setAlarmEnabled(false);
+    setScheduledAlarmDate(null);
+  });
 
   function handleWakeTimeChange(nextWakeTime) {
     const nextWakeDate = getNextTimeInTimeZone(nextWakeTime, currentTime);
@@ -70,6 +81,12 @@ export default function App() {
       wakeDate: nextWakeDate,
     });
     setSelectedRecommendationKey(null);
+    setIsRinging(false);
+
+    if (alarmEnabled) {
+      setAlarmAt(nextWakeDate);
+      setScheduledAlarmDate(nextWakeDate);
+    }
   }
 
   function handleRecommendationSelect(recommendation) {
@@ -78,28 +95,71 @@ export default function App() {
     setWakeTimeStr(formatHHMM(roundedDate));
     setHasUserSetWakeTime(true);
     setSelectedRecommendationKey(getRecommendationKey(roundedDate));
+    setIsRinging(false);
+
+    if (alarmEnabled) {
+      setAlarmAt(roundedDate);
+      setScheduledAlarmDate(roundedDate);
+    }
   }
 
   function handleClear() {
     clearAlarm();
+    setAlarmEnabled(false);
+    setIsRinging(false);
+    setScheduledAlarmDate(null);
     setHasUserSetWakeTime(false);
     setRecommendationAnchor(null);
     setSelectedRecommendationKey(null);
     alert('Cleared');
   }
 
+  function handleAlarmToggle() {
+    if (alarmEnabled) {
+      clearAlarm();
+      setAlarmEnabled(false);
+      setIsRinging(false);
+      return;
+    }
+
+    const nextWakeDate = getNextTimeInTimeZone(wakeTimeStr, new Date());
+
+    unlockAlarmSound();
+    setAlarmAt(nextWakeDate);
+    setScheduledAlarmDate(nextWakeDate);
+    setAlarmEnabled(true);
+    setHasUserSetWakeTime(true);
+  }
+
+  function handleSnoozeToggle() {
+    setSnoozeEnabled((value) => !value);
+  }
+
+  function handleSnooze(minutes) {
+    const nextWakeDate = new Date(Date.now() + minutes * 60 * 1000);
+
+    setWakeTimeStr(formatHHMM(nextWakeDate));
+    setHasUserSetWakeTime(true);
+    setRecommendationAnchor({
+      bedDate: new Date(currentTime),
+      wakeDate: nextWakeDate,
+    });
+    setSelectedRecommendationKey(null);
+    setIsRinging(false);
+    setAlarmEnabled(true);
+    setScheduledAlarmDate(nextWakeDate);
+    setAlarmAt(nextWakeDate);
+  }
+
   function handleStageToggle() {
     const nextValue = !showStageMarkers;
 
-    setShowStageMarkers(nextValue);
     setShowRedStages(nextValue);
     setShowAmberStages(nextValue);
     setShowGreenStages(nextValue);
   }
 
   function handleRagToggle(color) {
-    setShowStageMarkers(true);
-
     if (color === 'red') {
       setShowRedStages((value) => !value);
     } else if (color === 'amber') {
@@ -183,7 +243,16 @@ export default function App() {
 
         {hasUserSetWakeTime && <Recommendations times={rec} onSelect={handleRecommendationSelect} />}
 
-        <AlarmControls onSet={() => { setAlarmAt(wakeDate); alert('Alarm set'); }} onClear={handleClear} />
+        <AlarmControls
+          alarmEnabled={alarmEnabled}
+          snoozeEnabled={snoozeEnabled}
+          isRinging={isRinging}
+          snoozeOptions={SNOOZE_OPTIONS}
+          onAlarmToggle={handleAlarmToggle}
+          onSnoozeToggle={handleSnoozeToggle}
+          onSnooze={handleSnooze}
+          onClear={handleClear}
+        />
       </main>
     </div>
   );
