@@ -6,7 +6,13 @@ const CYCLE_MINUTES = 90;
 const DISRUPTIVE_MARK_MINUTES = 45;
 const REM_BY_CYCLE_MINUTES = [10, 15, 20, 25, 30];
 
-export default function CycleRing({ currentTime, wakeDate, size = 410 }) {
+export default function CycleRing({
+  currentTime,
+  wakeDate,
+  showCycleBoundaries = true,
+  showStageMarkers = true,
+  size = 410,
+}) {
   const parts = getTimeZoneParts(currentTime);
   const digitalTime = formatTime12(currentTime);
   const cx = size / 2;
@@ -133,9 +139,9 @@ export default function CycleRing({ currentTime, wakeDate, size = 410 }) {
           d={describePieSlice(cx, cy, radius - 22, sleepStartAngle, sleepEndAngle)}
         />
       )}
-      {disruptiveDividers}
-      {remDividers}
-      {cycleDividers}
+      {showStageMarkers && disruptiveDividers}
+      {showStageMarkers && remDividers}
+      {showCycleBoundaries && cycleDividers}
       {ticks}
       {numbers}
       <ClockHand cx={cx} cy={cy} angle={hourAngle} length={radius * 0.5} className="clock-hand clock-hand--hour" />

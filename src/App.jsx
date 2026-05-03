@@ -18,6 +18,8 @@ export default function App() {
   const [hasUserSetWakeTime, setHasUserSetWakeTime] = useState(false);
   const [recommendationAnchor, setRecommendationAnchor] = useState(null);
   const [selectedRecommendationKey, setSelectedRecommendationKey] = useState(null);
+  const [showCycleBoundaries, setShowCycleBoundaries] = useState(true);
+  const [showStageMarkers, setShowStageMarkers] = useState(true);
 
   useEffect(() => {
     function tick() {
@@ -78,10 +80,32 @@ export default function App() {
 
       <main className="app-main">
         <div className="ring-wrap">
-          <CycleRing currentTime={currentTime} wakeDate={wakeDate} />
+          <CycleRing
+            currentTime={currentTime}
+            wakeDate={wakeDate}
+            showCycleBoundaries={showCycleBoundaries}
+            showStageMarkers={showStageMarkers}
+          />
         </div>
 
         <ClockDisplay />
+
+        <div className="display-toggles" aria-label="Clock display options">
+          <button
+            type="button"
+            className={showCycleBoundaries ? 'display-toggle display-toggle--active' : 'display-toggle'}
+            onClick={() => setShowCycleBoundaries((value) => !value)}
+          >
+            Cycles
+          </button>
+          <button
+            type="button"
+            className={showStageMarkers ? 'display-toggle display-toggle--active' : 'display-toggle'}
+            onClick={() => setShowStageMarkers((value) => !value)}
+          >
+            Sleep Stages
+          </button>
+        </div>
 
         <TimePicker value={wakeTimeStr} onChange={handleWakeTimeChange} />
 
